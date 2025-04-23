@@ -1,0 +1,15 @@
+#DIRs
+.vs/
+.cache/
+bin/
+bin-objs/
+bin-lib/
+build/
+_temp
+
+#Files-Types
+*.sln
+*.vcxproj
+*.user
+*.filters
+*.my.todo
