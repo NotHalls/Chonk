@@ -5,6 +5,7 @@ bin/
 bin-objs/
 bin-lib/
 build/
+test/
 _temp
 
 #Files-Types
