@@ -1,9 +1,6 @@
 {
     "C_Cpp.default.compileCommands": "${workspaceRoot}/build/compile_commands.json",
     "terminal.integrated.defaultProfile.windows": "Git Bash",
-    "[glsl]": {
-        "editor.formatOnSave": false
-    },
     "files.associations": {
         "xstring": "cpp",
         "algorithm": "cpp",
@@ -85,6 +82,7 @@
         "xmemory": "cpp",
         "xtr1common": "cpp",
         "xtree": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "coroutine": "cpp"
     }
 }

@@ -1,6 +1,12 @@
 #include <SDL3/SDL.h>
 #include <glad/glad.h>
+
+#include <chrono>
 #include <iostream>
+
+#include "Curvy.h"
+#include "Renderer/Shader.h"
+#include "tempData.h"
 
 int main()
 {
@@ -36,8 +42,47 @@ int main()
   bool IsRunning = true;
   SDL_Event Event;
 
+  auto startTime = std::chrono::high_resolution_clock::now();
+
+  /// Graphics Stuff ///
+  glCreateVertexArrays(1, &VAO);
+  glCreateBuffers(1, &VBO);
+  glCreateBuffers(1, &IBO);
+
+  glBindVertexArray(VAO);
+
+  // vertex buffer
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices,
+               GL_STATIC_DRAW);
+  // glBindBuffer(GL_ARRAY_BUFFER, 0);
+  // index buffer
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cubeIndices), cubeIndices,
+               GL_STATIC_DRAW);
+  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  // vertex array setup
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(0);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+  glBindVertexArray(0);
+
+  // shader setup
+  Shader defaultShader(
+      {{"assets/shaders/Default.vert.glsl", ShaderType::Vertex},
+       {"assets/shaders/Default.frag.glsl", ShaderType::Fragment}});
+  /// Graphics Stuff ///
+
   while(IsRunning)
   {
+    auto curtTime = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<float> delta = curtTime - startTime;
+    startTime = curtTime;
+    float dt = delta.count();
+    float fps = 1 / dt;
+    float frameTime = dt * 1000.0f;
+
     while(SDL_PollEvent(&Event))
     {
       if(Event.type == SDL_EVENT_QUIT)
@@ -45,9 +90,16 @@ int main()
     }
 
     glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    defaultShader.Bind();
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
 
     SDL_GL_SwapWindow(MainWindow);
+
+    // std::cout << "FPS: " << (int)fps << " (" << frameTime << " ms)"
+    //           << std::endl;
   }
 
   SDL_GL_DestroyContext(Context);
