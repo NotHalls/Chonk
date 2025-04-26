@@ -42,24 +42,29 @@ float cubeVertices[] = { // 6 faces × 4 vertices per face = 24 vertices
   -0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
 };
 
-
 uint32_t cubeIndices[] = {
-  // Front
-  0, 1, 2, 2, 3, 0,
+  // Front face (looking toward +Z)
+  0, 1, 2,
+  2, 3, 0,
 
-  // Back
-  4, 5, 6, 6, 7, 4,
+  // Back face (looking toward -Z)
+  4, 6, 5,
+  6, 4, 7,
 
-  // Left
-  8, 9, 10, 10, 11, 8,
+  // Left face (looking toward -X)
+  8, 9, 10,
+  10, 11, 8,
 
-  // Right
-  12, 13, 14, 14, 15, 12,
+  // Right face (looking toward +X)
+  12, 14, 13,
+  14, 12, 15,
 
-  // Top
-  16, 17, 18, 18, 19, 16,
+  // Top face (looking toward +Y)
+  16, 17, 18,
+  18, 19, 16,
 
-  // Bottom
-  20, 21, 22, 22, 23, 20
+  // Bottom face (looking toward -Y)
+  20, 22, 21,
+  22, 20, 23
 };
 // clang-format on
