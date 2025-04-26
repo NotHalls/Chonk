@@ -70,7 +70,8 @@ uint32_t Shader::CompileShader(const std::string &source, ShaderType type)
   {
     char errorMsg[512];
     glGetShaderInfoLog(shader, 512, nullptr, errorMsg);
-    std::cerr << "Failed To Compile Shader!\n" << errorMsg << std::endl;
+    std::cerr << "Failed To Compile " << (int)type << " Shader!\n"
+              << errorMsg << std::endl;
   }
 
   return shader;

@@ -3,6 +3,7 @@
 #include <cstdint>
 
 #include "Renderer/Camera.h"
+#include "Renderer/Texture.h"
 #include "Structs/Components.h"
 
 uint32_t VBO;

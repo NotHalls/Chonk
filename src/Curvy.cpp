@@ -66,8 +66,11 @@ int main()
                GL_STATIC_DRAW);
   // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   // vertex array setup
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+                        (void *)(3 * sizeof(float)));
+  glEnableVertexAttribArray(1);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
   glBindVertexArray(0);
@@ -76,6 +79,8 @@ int main()
   Shader defaultShader(
       {{"assets/shaders/Default.vert.glsl", ShaderType::Vertex},
        {"assets/shaders/Default.frag.glsl", ShaderType::Fragment}});
+
+  Texture groundTexture("assets/textures/grass_side.png");
   /// Graphics Stuff ///
   while(IsRunning)
   {
@@ -101,16 +106,21 @@ int main()
         IsRunning = false;
     }
 
+    glEnable(GL_DEPTH_TEST);
     glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     cam.OnUpdate(dt);
 
     glm::mat4 MVP = cam.GetVPMatrix() * CubeTransform.Get();
+    groundTexture.Bind(0);
 
     defaultShader.Bind();
     int uMVPLocation = glGetUniformLocation(defaultShader.Get(), "u_MVP");
     glUniformMatrix4fv(uMVPLocation, 1, GL_FALSE, glm::value_ptr(MVP));
+    int uTexLoc = glGetUniformLocation(defaultShader.Get(), "u_Texture0");
+    glUniform1i(uTexLoc, 0);
+
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
 
