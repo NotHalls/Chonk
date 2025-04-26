@@ -20,6 +20,7 @@ public:
 
   void Bind();
   void Unbind();
+  const uint32_t Get() const { return m_ID; }
 
 private:
   std::string ReadFile(const std::string &path);

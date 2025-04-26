@@ -1,8 +1,9 @@
-#include <SDL3/SDL.h>
-#include <glad/glad.h>
-
 #include <chrono>
 #include <iostream>
+
+#include <SDL3/SDL.h>
+#include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "Curvy.h"
 #include "Renderer/Shader.h"
@@ -45,6 +46,9 @@ int main()
   auto startTime = std::chrono::high_resolution_clock::now();
 
   /// Graphics Stuff ///
+  // setup
+  glViewport(0, 0, 800, 600);
+
   glCreateVertexArrays(1, &VAO);
   glCreateBuffers(1, &VBO);
   glCreateBuffers(1, &IBO);
@@ -73,7 +77,6 @@ int main()
       {{"assets/shaders/Default.vert.glsl", ShaderType::Vertex},
        {"assets/shaders/Default.frag.glsl", ShaderType::Fragment}});
   /// Graphics Stuff ///
-
   while(IsRunning)
   {
     auto curtTime = std::chrono::high_resolution_clock::now();
@@ -85,6 +88,8 @@ int main()
 
     while(SDL_PollEvent(&Event))
     {
+      cam.OnEvent(Event);
+
       if(Event.type == SDL_EVENT_QUIT)
         IsRunning = false;
     }
@@ -92,9 +97,15 @@ int main()
     glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    cam.OnUpdate(dt);
+
+    glm::mat4 MVP = cam.GetVPMatrix() * CubeTransform.Get();
+
     defaultShader.Bind();
+    int uMVPLocation = glGetUniformLocation(defaultShader.Get(), "u_MVP");
+    glUniformMatrix4fv(uMVPLocation, 1, GL_FALSE, glm::value_ptr(MVP));
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
     SDL_GL_SwapWindow(MainWindow);
 

@@ -66,7 +66,7 @@ file(GLOB_RECURSE STB_SOURCES "submodules/stb/*.cpp")
 add_executable(${PROJECT_NAME} ${MAIN_SOURCES} ${STB_SOURCES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC
-    submodules/glm/glm
+    submodules/glm
     submodules/imgui
     submodules/sdl/include
     submodules/stb
