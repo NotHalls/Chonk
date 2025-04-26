@@ -6,7 +6,7 @@
 class Camera
 {
 public:
-  Camera(float fov, float nearP, float farP);
+  Camera(float fov, float nearP, float farP, uint32_t width, uint32_t height);
   ~Camera() {}
 
   const glm::mat4 &GetVPMatrix() const { return m_ProjectionView; }
@@ -15,6 +15,9 @@ public:
   const float GetNearPlane() const { return m_NearPlane; }
   const float GetFatPlane() const { return m_FarPlane; }
 
+  const glm::vec3 &GetForward() const { return m_Forward; }
+  const glm::vec3 &GetUp() const { return m_Up; }
+
   void SetPosition(const glm::vec3 &pos);
   void SetForward(const glm::vec3 &forward);
   void SetFOV(float fov);
@@ -22,7 +25,7 @@ public:
   void SetFarPlane(float farP);
 
   // Camera Changes
-  void OnResize(int width, int height);
+  void OnResize(uint32_t width, uint32_t height);
   void OnUpdate(float dt);
   void OnEvent(SDL_Event &event);
 
@@ -34,6 +37,8 @@ private:
   glm::mat4 m_View;
   glm::mat4 m_ProjectionView;
 
+  uint32_t m_Width, m_Height;
+
   glm::vec3 m_Position;
   glm::vec3 m_Up;
   glm::vec3 m_Forward;
@@ -41,4 +46,10 @@ private:
   float m_FOV;
   float m_AspectRatio;
   float m_NearPlane, m_FarPlane;
+
+  // Camera Controller
+  float m_Speed = 5.0f;
+  float m_Sensitivity = 0.3f;
+  float m_Yaw = 90.0f, m_Pitch;
+  bool m_FirstMouse = true;
 };

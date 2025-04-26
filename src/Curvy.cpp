@@ -90,6 +90,13 @@ int main()
     {
       cam.OnEvent(Event);
 
+      // mouse State
+      if(Event.type == SDL_EVENT_KEY_DOWN &&
+         Event.key.scancode == SDL_SCANCODE_F)
+      {
+        FreeCursor = !FreeCursor;
+        SDL_SetWindowRelativeMouseMode(MainWindow, FreeCursor);
+      }
       if(Event.type == SDL_EVENT_QUIT)
         IsRunning = false;
     }
@@ -105,7 +112,7 @@ int main()
     int uMVPLocation = glGetUniformLocation(defaultShader.Get(), "u_MVP");
     glUniformMatrix4fv(uMVPLocation, 1, GL_FALSE, glm::value_ptr(MVP));
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
 
     SDL_GL_SwapWindow(MainWindow);
 
