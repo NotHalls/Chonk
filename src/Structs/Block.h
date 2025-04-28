@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-struct Block
+struct BlockInfo
 {
   uint32_t TopTextureID;
   uint32_t SideTextureID;

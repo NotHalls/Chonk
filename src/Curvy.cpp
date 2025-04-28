@@ -45,38 +45,8 @@ int main()
 
   auto startTime = std::chrono::high_resolution_clock::now();
 
-  /// Graphics Stuff ///
-  // setup
+  // opengl init setup
   glViewport(0, 0, 800, 600);
-
-  glCreateVertexArrays(1, &VAO);
-  glCreateBuffers(1, &VBO);
-  glCreateBuffers(1, &IBO);
-
-  glBindVertexArray(VAO);
-
-  // vertex buffer
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices,
-               GL_STATIC_DRAW);
-  // glBindBuffer(GL_ARRAY_BUFFER, 0);
-  // index buffer
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cubeIndices), cubeIndices,
-               GL_STATIC_DRAW);
-  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-  // vertex array setup
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
-                        (void *)(3 * sizeof(float)));
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
-                        (void *)(5 * sizeof(float)));
-  glEnableVertexAttribArray(2);
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-  glBindVertexArray(0);
 
   // shader setup
   Shader defaultShader(
@@ -84,6 +54,14 @@ int main()
        {"assets/shaders/Default.frag.glsl", ShaderType::Fragment}});
 
   Texture groundTexture("assets/textures/BoxSheet.png");
+  Mesh GrassBlock(CubeVertices, CubeIndices);
+  GrassBlock.GetBlockInfo().TopTextureID = 0;
+  GrassBlock.GetBlockInfo().SideTextureID = 1;
+  GrassBlock.GetBlockInfo().BottomTextureID = 2;
+  Mesh DirtBlock(CubeVertices, CubeIndices);
+  DirtBlock.GetBlockInfo().TopTextureID = 2;
+  DirtBlock.GetBlockInfo().SideTextureID = 2;
+  DirtBlock.GetBlockInfo().BottomTextureID = 2;
   /// Graphics Stuff ///
   while(IsRunning)
   {
@@ -118,7 +96,7 @@ int main()
 
     cam.OnUpdate(dt);
 
-    glm::mat4 MVP = cam.GetVPMatrix() * CubeTransform.Get();
+    glm::mat4 MVP = cam.GetVPMatrix() * GrassBlock.GetTransform().Get();
     groundTexture.Bind(0);
 
     defaultShader.Bind();
@@ -127,12 +105,12 @@ int main()
     int uTexLoc = glGetUniformLocation(defaultShader.Get(), "u_Texture0");
     glUniform1i(uTexLoc, 0);
     int uTexArray = glGetUniformLocation(defaultShader.Get(), "u_Textures");
-    int textureIDs[3] = {(int)grassBlock.TopTextureID,
-                         (int)grassBlock.SideTextureID,
-                         (int)grassBlock.BottomTextureID};
+    int textureIDs[3] = {(int)GrassBlock.GetBlockInfo().TopTextureID,
+                         (int)GrassBlock.GetBlockInfo().SideTextureID,
+                         (int)GrassBlock.GetBlockInfo().BottomTextureID};
     glUniform1iv(uTexArray, 3, textureIDs);
 
-    glBindVertexArray(VAO);
+    GrassBlock.Bind();
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
 
     SDL_GL_SwapWindow(MainWindow);
