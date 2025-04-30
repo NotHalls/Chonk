@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "Structs/Block.h"
+
 struct Transform
 {
   glm::vec3 Position;
@@ -18,4 +20,13 @@ struct Transform
     return glm::translate(glm::mat4(1.0f), Position) * rot *
            glm::scale(glm::mat4(1.0f), Scale);
   }
+};
+
+struct Block
+{
+  BlockID ID;
+
+  uint8_t TopTextureID;
+  uint8_t SideTextureID;
+  uint8_t BottomTextureID;
 };

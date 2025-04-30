@@ -4,8 +4,9 @@ layout(location = 0) in vec3 a_Pos;
 layout(location = 1) in vec2 a_UV;
 layout(location = 2) in float a_FaceID;
 
-uniform mat4 u_MVP;
+uniform mat4 u_VP;
 uniform int u_Textures[3];
+uniform vec3 u_ChunkOffset;
 
 out vec2 o_UVAtlas;
 
@@ -26,7 +27,8 @@ vec2 CalculateTextureForFace(int textureID, vec2 uvs)
 
 void main()
 {
-  gl_Position = u_MVP * vec4(a_Pos, 1.0f);
+  vec3 worldPos = a_Pos + u_ChunkOffset;
+  gl_Position = u_VP * vec4(a_Pos, 1.0f);
   int selectedTexture = u_Textures[int(a_FaceID)];
   o_UVAtlas = CalculateTextureForFace(selectedTexture, a_UV);
 }

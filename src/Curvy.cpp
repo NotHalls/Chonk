@@ -7,7 +7,6 @@
 
 #include "Curvy.h"
 #include "Renderer/Shader.h"
-#include "tempData.h"
 
 int main()
 {
@@ -54,15 +53,9 @@ int main()
        {"assets/shaders/Default.frag.glsl", ShaderType::Fragment}});
 
   Texture groundTexture("assets/textures/BoxSheet.png");
-  Mesh GrassBlock(CubeVertices, CubeIndices);
-  GrassBlock.GetBlockInfo().TopTextureID = 0;
-  GrassBlock.GetBlockInfo().SideTextureID = 1;
-  GrassBlock.GetBlockInfo().BottomTextureID = 2;
-  Mesh DirtBlock(CubeVertices, CubeIndices);
-  DirtBlock.GetBlockInfo().TopTextureID = 2;
-  DirtBlock.GetBlockInfo().SideTextureID = 2;
-  DirtBlock.GetBlockInfo().BottomTextureID = 2;
   /// Graphics Stuff ///
+
+  Chunk chunk;
   while(IsRunning)
   {
     auto curtTime = std::chrono::high_resolution_clock::now();
@@ -96,22 +89,28 @@ int main()
 
     cam.OnUpdate(dt);
 
-    glm::mat4 MVP = cam.GetVPMatrix() * GrassBlock.GetTransform().Get();
     groundTexture.Bind(0);
 
     defaultShader.Bind();
-    int uMVPLocation = glGetUniformLocation(defaultShader.Get(), "u_MVP");
-    glUniformMatrix4fv(uMVPLocation, 1, GL_FALSE, glm::value_ptr(MVP));
+    int uVPMatLoc = glGetUniformLocation(defaultShader.Get(), "u_VP");
+    glUniformMatrix4fv(uVPMatLoc, 1, GL_FALSE,
+                       glm::value_ptr(cam.GetVPMatrix()));
     int uTexLoc = glGetUniformLocation(defaultShader.Get(), "u_Texture0");
     glUniform1i(uTexLoc, 0);
-    int uTexArray = glGetUniformLocation(defaultShader.Get(), "u_Textures");
-    int textureIDs[3] = {(int)GrassBlock.GetBlockInfo().TopTextureID,
-                         (int)GrassBlock.GetBlockInfo().SideTextureID,
-                         (int)GrassBlock.GetBlockInfo().BottomTextureID};
-    glUniform1iv(uTexArray, 3, textureIDs);
+    int uChunkOffsetLoc =
+        glGetUniformLocation(defaultShader.Get(), "u_ChunkOffset");
+    glUniform3fv(uChunkOffsetLoc, 1,
+                 glm::value_ptr(static_cast<glm::vec3>(chunk.GetPosition())));
+    // int uTexArray = glGetUniformLocation(defaultShader.Get(),
+    // "u_Textures"); int textureIDs[3] =
+    // {(int)GrassBlock.GetBlockInfo().TopTextureID,
+    //                      (int)GrassBlock.GetBlockInfo().SideTextureID,
+    //                      (int)GrassBlock.GetBlockInfo().BottomTextureID};
+    // glUniform1iv(uTexArray, 3, textureIDs);
 
-    GrassBlock.Bind();
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+    chunk.Bind();
+    glDrawElements(GL_TRIANGLES, chunk.GetIndiceCount(), GL_UNSIGNED_INT,
+                   nullptr);
 
     SDL_GL_SwapWindow(MainWindow);
 
