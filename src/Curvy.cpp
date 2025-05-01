@@ -6,7 +6,9 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Curvy.h"
+#include "Renderer/Mesh.h"
 #include "Renderer/Shader.h"
+#include "include/tempData.h"
 
 int main()
 {
@@ -55,7 +57,15 @@ int main()
   Texture groundTexture("assets/textures/BoxSheet.png");
   /// Graphics Stuff ///
 
-  Chunk chunk;
+  std::vector<Mesh> meshes;
+  int xSize, ySize, zSize;
+  xSize = ySize = zSize = 16;
+  int chunkVolume = xSize * ySize * zSize;
+  for(int i = 0; i < chunkVolume; i++)
+  {
+    meshes.push_back(Mesh(CubeVertices, CubeIndices));
+  }
+
   while(IsRunning)
   {
     auto curtTime = std::chrono::high_resolution_clock::now();
@@ -92,30 +102,105 @@ int main()
     groundTexture.Bind(0);
 
     defaultShader.Bind();
-    int uVPMatLoc = glGetUniformLocation(defaultShader.Get(), "u_VP");
-    glUniformMatrix4fv(uVPMatLoc, 1, GL_FALSE,
-                       glm::value_ptr(cam.GetVPMatrix()));
+
     int uTexLoc = glGetUniformLocation(defaultShader.Get(), "u_Texture0");
     glUniform1i(uTexLoc, 0);
-    int uChunkOffsetLoc =
-        glGetUniformLocation(defaultShader.Get(), "u_ChunkOffset");
-    glUniform3fv(uChunkOffsetLoc, 1,
-                 glm::value_ptr(static_cast<glm::vec3>(chunk.GetPosition())));
-    // int uTexArray = glGetUniformLocation(defaultShader.Get(),
-    // "u_Textures"); int textureIDs[3] =
-    // {(int)GrassBlock.GetBlockInfo().TopTextureID,
-    //                      (int)GrassBlock.GetBlockInfo().SideTextureID,
-    //                      (int)GrassBlock.GetBlockInfo().BottomTextureID};
-    // glUniform1iv(uTexArray, 3, textureIDs);
 
-    chunk.Bind();
-    glDrawElements(GL_TRIANGLES, chunk.GetIndiceCount(), GL_UNSIGNED_INT,
-                   nullptr);
+    for(int y = 0; y < ySize; y++)
+    {
+      for(int x = 0; x < xSize; x++)
+      {
+        for(int z = 0; z < zSize; z++)
+        {
+          if(y == 0)
+          {
+            int index = x + zSize * (z + xSize * y);
+            Mesh &mesh = meshes[index];
+            mesh.GetPosition().x = (float)x;
+            mesh.GetPosition().y = (float)y;
+            mesh.GetPosition().z = (float)z;
+            mesh.GetTextureID().Top = 4;
+            mesh.GetTextureID().Side = 4;
+            mesh.GetTextureID().Bottom = 4;
+
+            glm::mat4 model =
+                glm::translate(glm::mat4(1.0f), mesh.GetPosition());
+            glm::mat4 mvp = cam.GetVPMatrix() * model;
+            int uVPMatLoc = glGetUniformLocation(defaultShader.Get(), "u_MVP");
+            glUniformMatrix4fv(uVPMatLoc, 1, GL_FALSE, glm::value_ptr(mvp));
+
+            int uTexArray =
+                glGetUniformLocation(defaultShader.Get(), "u_Textures");
+            int textureIDs[3] = {(int)mesh.GetTextureID().Top,
+                                 (int)mesh.GetTextureID().Side,
+                                 (int)mesh.GetTextureID().Bottom};
+            glUniform1iv(uTexArray, 3, textureIDs);
+
+            mesh.Bind();
+            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+          }
+          if(y < (ySize - 1) && y > 0)
+          {
+            int index = x + xSize * (z + zSize * y);
+            Mesh &mesh = meshes[index];
+            mesh.GetPosition().x = (float)x;
+            mesh.GetPosition().y = (float)y;
+            mesh.GetPosition().z = (float)z;
+            mesh.GetTextureID().Top = 3;
+            mesh.GetTextureID().Side = 3;
+            mesh.GetTextureID().Bottom = 3;
+
+            glm::mat4 model =
+                glm::translate(glm::mat4(1.0f), mesh.GetPosition());
+            glm::mat4 mvp = cam.GetVPMatrix() * model;
+            int uVPMatLoc = glGetUniformLocation(defaultShader.Get(), "u_MVP");
+            glUniformMatrix4fv(uVPMatLoc, 1, GL_FALSE, glm::value_ptr(mvp));
+
+            int uTexArray =
+                glGetUniformLocation(defaultShader.Get(), "u_Textures");
+            int textureIDs[3] = {(int)mesh.GetTextureID().Top,
+                                 (int)mesh.GetTextureID().Side,
+                                 (int)mesh.GetTextureID().Bottom};
+            glUniform1iv(uTexArray, 3, textureIDs);
+
+            mesh.Bind();
+            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+          }
+          if(y == (ySize - 1))
+          {
+            int index = x + xSize * (z + zSize * y);
+            Mesh &mesh = meshes[index];
+            mesh.GetPosition().x = (float)x;
+            mesh.GetPosition().y = (float)y;
+            mesh.GetPosition().z = (float)z;
+            mesh.GetTextureID().Top = 1;
+            mesh.GetTextureID().Side = 2;
+            mesh.GetTextureID().Bottom = 3;
+
+            glm::mat4 model =
+                glm::translate(glm::mat4(1.0f), mesh.GetPosition());
+            glm::mat4 mvp = cam.GetVPMatrix() * model;
+            int uVPMatLoc = glGetUniformLocation(defaultShader.Get(), "u_MVP");
+            glUniformMatrix4fv(uVPMatLoc, 1, GL_FALSE, glm::value_ptr(mvp));
+
+            int uTexArray =
+                glGetUniformLocation(defaultShader.Get(), "u_Textures");
+            int textureIDs[3] = {(int)mesh.GetTextureID().Top,
+                                 (int)mesh.GetTextureID().Side,
+                                 (int)mesh.GetTextureID().Bottom};
+            glUniform1iv(uTexArray, 3, textureIDs);
+
+            mesh.Bind();
+            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+          }
+        }
+      }
+    }
 
     SDL_GL_SwapWindow(MainWindow);
 
-    // std::cout << "FPS: " << (int)fps << " (" << frameTime << " ms)"
-    //           << std::endl;
+    std::cout << "FPS: " << (int)fps << " (" << frameTime << " ms)"
+              << std::endl;
   }
 
   SDL_GL_DestroyContext(Context);

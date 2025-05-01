@@ -3,7 +3,6 @@
 #include <cstdint>
 
 #include "Renderer/Camera.h"
-#include "Renderer/Chunk.h"
 #include "Renderer/Texture.h"
 #include "Structs/Components.h"
 
