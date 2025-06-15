@@ -1,31 +1,60 @@
 {
     "configurations": [
+        // clang stuff //
         {
-            "name": "Launch Debug",
+            "name": "Clang Launch Debug",
             "request": "launch",
             "type": "cppvsdbg",
             "cwd": "${workspaceFolder}",
             "program": "bin/Windows-Debug-Clang/Curvy.exe",
             "console": "newExternalWindow",
-            "preLaunchTask": "Build",
+            "preLaunchTask": "Clang Build Debug",
         },
         {
-            "name": "Launch Release",
+            "name": "Clang Launch Release",
             "request": "launch",
             "type": "cppvsdbg",
             "cwd": "${workspaceFolder}",
             "program": "bin/Windows-Release-Clang/Curvy.exe",
             "console": "newExternalWindow",
-            "preLaunchTask": "Build",
+            "preLaunchTask": "Clang Build Release",
         },
         {
-            "name": "Launch Export",
+            "name": "Clang Launch Export",
             "request": "launch",
             "type": "cppvsdbg",
             "cwd": "${workspaceFolder}",
             "program": "bin/Windows-Export-Clang/Curvy.exe",
             "console": "newExternalWindow",
-            "preLaunchTask": "Build",
+            "preLaunchTask": "Clang Build Export",
+        },
+        // MSVC stuff //
+        {
+            "name": "MSVC Launch Debug",
+            "request": "launch",
+            "type": "cppvsdbg",
+            "cwd": "${workspaceFolder}",
+            "program": "bin/Windows-Debug-MSVC/Curvy.exe",
+            "console": "newExternalWindow",
+            "preLaunchTask": "MSVC Build Debug",
+        },
+        {
+            "name": "MSVC Launch Release",
+            "request": "launch",
+            "type": "cppvsdbg",
+            "cwd": "${workspaceFolder}",
+            "program": "bin/Windows-Release-MSVC/Curvy.exe",
+            "console": "newExternalWindow",
+            "preLaunchTask": "MSVC Build Release",
+        },
+        {
+            "name": "MSVC Launch Export",
+            "request": "launch",
+            "type": "cppvsdbg",
+            "cwd": "${workspaceFolder}",
+            "program": "bin/Windows-Export-MSVC/Curvy.exe",
+            "console": "newExternalWindow",
+            "preLaunchTask": "MSVC Build Export",
         }
     ]
 }

@@ -2,8 +2,8 @@
 .vs/
 .cache/
 bin/
-bin-objs/
 bin-lib/
+bin-objs/
 build/
 test/
 _temp

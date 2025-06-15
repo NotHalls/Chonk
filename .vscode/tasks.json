@@ -1,21 +1,65 @@
 {
     "tasks": [
         {
+            "label": "CLEAN BUILD EVERYTHING",
+            "type": "shell",
+            "dependsOrder": "parallel",
+            "dependsOn": [
+                "Clang Clean ReBuild (DEBUG)",
+                "Clang Clean ReBuild (RELEASE)",
+                "Clang Clean ReBuild (EXPORT)",
+                "MSVC Clean ReBuild (DEBUG)",
+                "MSVC Clean ReBuild (RELEASE)",
+                "MSVC Clean ReBuild (EXPORT)"
+            ],
+            "group": "none"
+        },
+        {
+            "label": "EVERYTHING",
+            "type": "shell",
+            "dependsOrder": "parallel",
+            "dependsOn": [
+                "Clang Make And Build (DEBUG)",
+                "Clang Make And Build (RELEASE)",
+                "Clang Make And Build (EXPORT)",
+                "MSVC Make And Build (DEBUG)",
+                "MSVC Make And Build (RELEASE)",
+                "MSVC Make And Build (EXPORT)"
+            ],
+            "group": "none"
+        },
+        {
+            "label": "ONLY BUILD EVERYTHING",
+            "type": "shell",
+            "dependsOrder": "parallel",
+            "dependsOn": [
+                "Clang Build Debug",
+                "Clang Build Release",
+                "Clang Build Export",
+                "MSVC Build Debug",
+                "MSVC Build Release",
+                "MSVC Build Export",
+            ],
+            "group": "none"
+        },
+        {
             "label": "Clean",
             "type": "shell",
-            "command": "rm -rf build bin",
+            "command": "rm -rf build bin bin-objs bin-libs",
             "args": [],
             "options": {
                 "cwd": "${workspaceFolder}"
             }
         },
+        // Clang Stuff //
+        // build command
         {
-            "label": "Build",
+            "label": "Clang Build Debug",
             "type": "shell",
             "command": "cmake",
             "args": [
                 "--build",
-                "build"
+                "build/Debug_Clang"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -26,12 +70,45 @@
             }
         },
         {
-            "label": "DEBUG MODE",
+            "label": "Clang Build Release",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "build/Release_Clang"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Clang Build Export",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "build/Export_Clang"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        // other commands
+        {
+            "label": "CLANG DEBUG MODE",
             "type": "shell",
             "command": "cmake",
             "args": [
                 "-G Ninja",
-                "-B build",
+                "-B build/Debug_Clang",
                 "-DCMAKE_BUILD_TYPE=Debug",
                 "-DCMAKE_C_COMPILER=clang",
                 "-DCMAKE_CXX_COMPILER=clang++"
@@ -45,12 +122,12 @@
             }
         },
         {
-            "label": "RELEASE MODE",
+            "label": "CLANG RELEASE MODE",
             "type": "shell",
             "command": "cmake",
             "args": [
                 "-G Ninja",
-                "-B build",
+                "-B build/Release_Clang",
                 "-DCMAKE_BUILD_TYPE=Release",
                 "-DCMAKE_C_COMPILER=clang",
                 "-DCMAKE_CXX_COMPILER=clang++"
@@ -64,12 +141,12 @@
             }
         },
         {
-            "label": "EXPORT MODE",
+            "label": "CLANG EXPORT MODE",
             "type": "shell",
             "command": "cmake",
             "args": [
                 "-G Ninja",
-                "-B build",
+                "-B build/Export_Clang",
                 "-DCMAKE_BUILD_TYPE=Export",
                 "-DCMAKE_C_COMPILER=clang",
                 "-DCMAKE_CXX_COMPILER=clang++"
@@ -83,12 +160,12 @@
             }
         },
         {
-            "label": "Make And Build (DEBUG)",
+            "label": "Clang Make And Build (DEBUG)",
             "type": "shell",
             "dependsOrder": "sequence",
             "dependsOn": [
-                "DEBUG MODE",
-                "Build"
+                "CLANG DEBUG MODE",
+                "Clang Build Debug"
             ],
             "group": {
                 "kind": "build",
@@ -96,12 +173,12 @@
             }
         },
         {
-            "label": "Make And Build (RELEASE)",
+            "label": "Clang Make And Build (RELEASE)",
             "type": "shell",
             "dependsOrder": "sequence",
             "dependsOn": [
-                "RELEASE MODE",
-                "Build"
+                "CLANG RELEASE MODE",
+                "Clang Build Release"
             ],
             "group": {
                 "kind": "build",
@@ -109,12 +186,12 @@
             }
         },
         {
-            "label": "Make And Build (EXPORT)",
+            "label": "Clang Make And Build (EXPORT)",
             "type": "shell",
             "dependsOrder": "sequence",
             "dependsOn": [
-                "EXPORT MODE",
-                "Build"
+                "CLANG EXPORT MODE",
+                "Clang Build Export"
             ],
             "group": {
                 "kind": "build",
@@ -122,33 +199,205 @@
             }
         },
         {
-            "label": "Clean ReBuild (DEBUG)",
+            "label": "Clang Clean ReBuild (DEBUG)",
             "type": "shell",
             "dependsOrder": "sequence",
             "dependsOn": [
                 "Clean",
-                "Make And Build (DEBUG)"
+                "Clang Make And Build (DEBUG)"
             ],
             "group": "none",
             "problemMatcher": []
         },
         {
-            "label": "Clean ReBuild (RELEASE)",
+            "label": "Clang Clean ReBuild (RELEASE)",
             "type": "shell",
             "dependsOrder": "sequence",
             "dependsOn": [
                 "Clean",
-                "Make And Build (RELEASE)"
+                "Clang Make And Build (RELEASE)"
             ],
             "group": "none"
         },
         {
-            "label": "Clean ReBuild (EXPORT)",
+            "label": "Clang Clean ReBuild (EXPORT)",
             "type": "shell",
             "dependsOrder": "sequence",
             "dependsOn": [
                 "Clean",
-                "Make And Build (EXPORT)"
+                "Clang Make And Build (EXPORT)"
+            ],
+            "group": "none"
+        },
+        // MSVC Stuff //
+        // build command
+        {
+            "label": "MSVC Build Debug",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "build/Debug_MSVC"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "MSVC Build Release",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "build/Release_MSVC"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "MSVC Build Export",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "build/Export_MSVC"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        // other commands
+        {
+            "label": "MSVC DEBUG MODE",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-G Visual Studio 17 2022",
+                "-B build/Debug_MSVC",
+                "-DCMAKE_BUILD_TYPE=Debug",
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "MSVC RELEASE MODE",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-G Visual Studio 17 2022",
+                "-B build/Release_MSVC",
+                "-DCMAKE_BUILD_TYPE=Release",
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "MSVC EXPORT MODE",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-G Visual Studio 17 2022",
+                "-B build/Export_MSVC",
+                "-DCMAKE_BUILD_TYPE=Export",
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "MSVC Make And Build (DEBUG)",
+            "type": "shell",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "MSVC DEBUG MODE",
+                "MSVC Build Debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "MSVC Make And Build (RELEASE)",
+            "type": "shell",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "MSVC RELEASE MODE",
+                "MSVC Build Release"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "MSVC Make And Build (EXPORT)",
+            "type": "shell",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "MSVC EXPORT MODE",
+                "MSVC Build Export"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "MSVC Clean ReBuild (DEBUG)",
+            "type": "shell",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Clean",
+                "MSVC Make And Build (DEBUG)"
+            ],
+            "group": "none",
+            "problemMatcher": []
+        },
+        {
+            "label": "MSVC Clean ReBuild (RELEASE)",
+            "type": "shell",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Clean",
+                "MSVC Make And Build (RELEASE)"
+            ],
+            "group": "none"
+        },
+        {
+            "label": "MSVC Clean ReBuild (EXPORT)",
+            "type": "shell",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Clean",
+                "MSVC Make And Build (EXPORT)"
             ],
             "group": "none"
         }

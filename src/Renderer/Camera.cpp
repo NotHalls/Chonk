@@ -59,7 +59,7 @@ void Camera::OnEvent(SDL_Event &event)
     m_Yaw += event.motion.xrel * m_Sensitivity;
     m_Pitch -= event.motion.yrel * m_Sensitivity;
 
-    m_Pitch = glm::clamp(m_Pitch, -90.0f, 90.0f);
+    m_Pitch = glm::clamp(m_Pitch, -89.9f, 89.9f);
 
     glm::vec3 rotDir = m_Forward;
     rotDir.x = glm::cos(glm::radians(m_Yaw)) * glm::cos(glm::radians(m_Pitch));

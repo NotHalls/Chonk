@@ -21,12 +21,3 @@ struct Transform
            glm::scale(glm::mat4(1.0f), Scale);
   }
 };
-
-struct Block
-{
-  BlockID ID;
-
-  uint8_t TopTextureID;
-  uint8_t SideTextureID;
-  uint8_t BottomTextureID;
-};

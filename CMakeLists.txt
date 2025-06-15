@@ -80,3 +80,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 imgui glad)
 target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Debug>:CV_DEBUG>)
 target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Release>:CV_RELEASE>)
 target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Export>:CV_EXPORT>)
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_SOURCE_DIR}/assets"
+    "${CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CONFIG_UPPER}}/assets"
+)

@@ -1,43 +1,48 @@
-// #pragma once
+#pragma once
 
-// #include <cstdint>
-// #include <vector>
+#include <array>
+#include <cstdint>
+#include <vector>
 
-// #include <glm/glm.hpp>
+#include <glm/glm.hpp>
 
-// #include "Structs/Components.h"
+#include "Structs/Block.h"
 
-// class Chunk
-// {
-// public:
-//   Chunk(const glm::ivec3 &pos = {0.0f, 0.0f, 0.0f});
-//   ~Chunk() {}
+/// @todo: after optimization tests make Y: 256
+constexpr size_t CHUNK_SIZE_X = 16;
+constexpr size_t CHUNK_SIZE_Y = 16;
+constexpr size_t CHUNK_SIZE_Z = 16;
+constexpr size_t CHUNK_VOLUME = CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z;
 
-//   void Bind();
-//   void Unbind();
+class Chunk
+{
+public:
+  Chunk();
+  ~Chunk() {}
 
-//   const glm::ivec3 &GetPosition() const { return m_Position; }
-//   const uint32_t GetIndiceCount() const { return m_IndiceCount; }
-//   void GenerateMesh();
-//   void RecalculateData();
+  void Bind();
+  void Unbind();
 
-// private:
-//   void Init();
-//   void GenerateChunk();
+  const glm::vec3 &GetPosition() const { return m_Position; }
+  const int GetBlockIndex(int x, int y, int z) const;
 
-// private:
-//   uint32_t m_VBO;
-//   uint32_t m_VAO;
-//   uint32_t m_IBO;
+  void Init();
+  void RegenerateChunk();
+  void GenerateMesh();
+  void Draw();
 
-//   glm::ivec3 m_Position;
+private:
+  void addVertices(int x, int y, int z, int faceIndex);
 
-//   const int m_ChunkWidth = 8;
-//   const int m_ChunkHeight = 8;
-//   const int m_ChunkDepth = 8;
+private:
+  uint32_t m_VAO;
+  uint32_t m_VBO;
+  uint32_t m_IBO;
 
-//   std::vector<Block> m_Blocks;
-//   std::vector<float> m_Vertices;
-//   std::vector<uint32_t> m_Indices;
-//   uint32_t m_IndiceCount;
-// };
+  glm::vec3 m_Position;
+
+  std::array<Block, CHUNK_VOLUME> m_Blocks;
+  std::vector<float> m_Vertices;
+  std::vector<uint32_t> m_Indices;
+  uint32_t m_CurrentVerticeCount = 0;
+};

@@ -3,9 +3,11 @@
 
 #include <SDL3/SDL.h>
 #include <glad/glad.h>
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Curvy.h"
+#include "Renderer/Chunk.h"
 #include "Renderer/Mesh.h"
 #include "Renderer/Shader.h"
 #include "include/tempData.h"
@@ -38,6 +40,16 @@ int main()
     return -1;
   }
 
+  if(SDL_GL_MakeCurrent(MainWindow, Context) < 0)
+  {
+    std::cerr << "Failed To Make Context Current: " << SDL_GetError()
+              << std::endl;
+    SDL_GL_DestroyContext(Context);
+    SDL_DestroyWindow(MainWindow);
+    SDL_Quit();
+    return -1;
+  }
+
   if(!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress))
     std::cerr << "Failed To Init Glad: " << SDL_GetError() << std::endl;
 
@@ -57,14 +69,8 @@ int main()
   Texture groundTexture("assets/textures/BoxSheet.png");
   /// Graphics Stuff ///
 
-  std::vector<Mesh> meshes;
-  int xSize, ySize, zSize;
-  xSize = ySize = zSize = 16;
-  int chunkVolume = xSize * ySize * zSize;
-  for(int i = 0; i < chunkVolume; i++)
-  {
-    meshes.push_back(Mesh(CubeVertices, CubeIndices));
-  }
+  Chunk chunk;
+  // Mesh mesh(CubeVertices, CubeIndices);
 
   while(IsRunning)
   {
@@ -99,103 +105,26 @@ int main()
 
     cam.OnUpdate(dt);
 
+    defaultShader.Bind();
     groundTexture.Bind(0);
 
-    defaultShader.Bind();
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), chunk.GetPosition());
+    glm::mat4 mvp = cam.GetVPMatrix() * model;
 
     int uTexLoc = glGetUniformLocation(defaultShader.Get(), "u_Texture0");
     glUniform1i(uTexLoc, 0);
+    int uMVPLoc = glGetUniformLocation(defaultShader.Get(), "u_MVP");
+    glUniformMatrix4fv(uMVPLoc, 1, GL_FALSE, glm::value_ptr(mvp));
+    int uTexsLoc = glGetUniformLocation(defaultShader.Get(), "u_Textures");
+    int texs[3] = {1, 2, 3};
+    glUniform1iv(uTexsLoc, 3, texs);
 
-    for(int y = 0; y < ySize; y++)
-    {
-      for(int x = 0; x < xSize; x++)
-      {
-        for(int z = 0; z < zSize; z++)
-        {
-          if(y == 0)
-          {
-            int index = x + zSize * (z + xSize * y);
-            Mesh &mesh = meshes[index];
-            mesh.GetPosition().x = (float)x;
-            mesh.GetPosition().y = (float)y;
-            mesh.GetPosition().z = (float)z;
-            mesh.GetTextureID().Top = 4;
-            mesh.GetTextureID().Side = 4;
-            mesh.GetTextureID().Bottom = 4;
+    // mesh.Bind();
+    // glDrawElements(GL_TRIANGLES, CubeIndices.size(), GL_UNSIGNED_INT,
+    // nullptr);
 
-            glm::mat4 model =
-                glm::translate(glm::mat4(1.0f), mesh.GetPosition());
-            glm::mat4 mvp = cam.GetVPMatrix() * model;
-            int uVPMatLoc = glGetUniformLocation(defaultShader.Get(), "u_MVP");
-            glUniformMatrix4fv(uVPMatLoc, 1, GL_FALSE, glm::value_ptr(mvp));
-
-            int uTexArray =
-                glGetUniformLocation(defaultShader.Get(), "u_Textures");
-            int textureIDs[3] = {(int)mesh.GetTextureID().Top,
-                                 (int)mesh.GetTextureID().Side,
-                                 (int)mesh.GetTextureID().Bottom};
-            glUniform1iv(uTexArray, 3, textureIDs);
-
-            mesh.Bind();
-            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
-          }
-          if(y < (ySize - 1) && y > 0)
-          {
-            int index = x + xSize * (z + zSize * y);
-            Mesh &mesh = meshes[index];
-            mesh.GetPosition().x = (float)x;
-            mesh.GetPosition().y = (float)y;
-            mesh.GetPosition().z = (float)z;
-            mesh.GetTextureID().Top = 3;
-            mesh.GetTextureID().Side = 3;
-            mesh.GetTextureID().Bottom = 3;
-
-            glm::mat4 model =
-                glm::translate(glm::mat4(1.0f), mesh.GetPosition());
-            glm::mat4 mvp = cam.GetVPMatrix() * model;
-            int uVPMatLoc = glGetUniformLocation(defaultShader.Get(), "u_MVP");
-            glUniformMatrix4fv(uVPMatLoc, 1, GL_FALSE, glm::value_ptr(mvp));
-
-            int uTexArray =
-                glGetUniformLocation(defaultShader.Get(), "u_Textures");
-            int textureIDs[3] = {(int)mesh.GetTextureID().Top,
-                                 (int)mesh.GetTextureID().Side,
-                                 (int)mesh.GetTextureID().Bottom};
-            glUniform1iv(uTexArray, 3, textureIDs);
-
-            mesh.Bind();
-            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
-          }
-          if(y == (ySize - 1))
-          {
-            int index = x + xSize * (z + zSize * y);
-            Mesh &mesh = meshes[index];
-            mesh.GetPosition().x = (float)x;
-            mesh.GetPosition().y = (float)y;
-            mesh.GetPosition().z = (float)z;
-            mesh.GetTextureID().Top = 1;
-            mesh.GetTextureID().Side = 2;
-            mesh.GetTextureID().Bottom = 3;
-
-            glm::mat4 model =
-                glm::translate(glm::mat4(1.0f), mesh.GetPosition());
-            glm::mat4 mvp = cam.GetVPMatrix() * model;
-            int uVPMatLoc = glGetUniformLocation(defaultShader.Get(), "u_MVP");
-            glUniformMatrix4fv(uVPMatLoc, 1, GL_FALSE, glm::value_ptr(mvp));
-
-            int uTexArray =
-                glGetUniformLocation(defaultShader.Get(), "u_Textures");
-            int textureIDs[3] = {(int)mesh.GetTextureID().Top,
-                                 (int)mesh.GetTextureID().Side,
-                                 (int)mesh.GetTextureID().Bottom};
-            glUniform1iv(uTexArray, 3, textureIDs);
-
-            mesh.Bind();
-            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
-          }
-        }
-      }
-    }
+    chunk.Bind();
+    chunk.Draw();
 
     SDL_GL_SwapWindow(MainWindow);
 
