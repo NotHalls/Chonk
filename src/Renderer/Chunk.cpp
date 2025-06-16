@@ -138,7 +138,7 @@ void Chunk::GenerateMesh()
 
 void Chunk::Draw()
 {
-#ifdef CV_DEBUG
+#ifdef CHK_DEBUG
   // std::cout << "VAO: " << m_VAO << ", VBO: " << m_VBO << ", IBO: " << m_IBO
   //           << "\n";
   // std::cout << "Indices size: " << m_Indices.size() << "\n";

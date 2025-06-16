@@ -10,9 +10,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
 if(WIN32)
-    add_compile_definitions(CV_WINDOWS)
+    add_compile_definitions(CHK_WINDOWS)
 elseif(UNIX)
-    add_compile_definitions(CV_UNIX)
+    add_compile_definitions(CHK_UNIX)
 endif()
 
 
@@ -77,9 +77,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 imgui glad)
 
-target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Debug>:CV_DEBUG>)
-target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Release>:CV_RELEASE>)
-target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Export>:CV_EXPORT>)
+target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Debug>:CHK_DEBUG>)
+target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Release>:CHK_RELEASE>)
+target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Export>:CHK_EXPORT>)
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory
     "${CMAKE_SOURCE_DIR}/assets"

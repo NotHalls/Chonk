@@ -4,5 +4,10 @@
     "[markdown]": {
         "editor.formatOnSave": false,
         "editor.defaultFormatter": null
+    },
+    "files.exclude": {
+        "**/build": true,
+        "**/bin": true,
+        "**/bin-objs": true,
     }
 }
