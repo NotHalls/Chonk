@@ -6,7 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Curvy.h"
+#include "Chonk.h"
 #include "Renderer/Chunk.h"
 #include "Renderer/Mesh.h"
 #include "Renderer/Shader.h"
@@ -25,7 +25,7 @@ int main()
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
   SDL_Window *MainWindow = SDL_CreateWindow(
-      "Curvy", 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+      "Chonk", 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
   if(!MainWindow)
   {
     std::cerr << "Failed To Create Window: " << SDL_GetError() << std::endl;
@@ -116,7 +116,7 @@ int main()
     int uMVPLoc = glGetUniformLocation(defaultShader.Get(), "u_MVP");
     glUniformMatrix4fv(uMVPLoc, 1, GL_FALSE, glm::value_ptr(mvp));
     int uTexsLoc = glGetUniformLocation(defaultShader.Get(), "u_Textures");
-    int texs[3] = {1, 2, 3};
+    int texs[3] = {3, 3, 3};
     glUniform1iv(uTexsLoc, 3, texs);
 
     // mesh.Bind();
