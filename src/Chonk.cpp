@@ -12,54 +12,21 @@
 #include "Renderer/Shader.h"
 #include "include/tempData.h"
 
+#include "System/Context.h"
+#include "System/Init.h"
+#include "System/Window.h"
+
 int main()
 {
-  if(!SDL_Init(SDL_INIT_VIDEO))
-  {
-    std::cerr << "Failed To Init SDL_VIDEO: " << SDL_GetError() << std::endl;
-    return -1;
-  }
-
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-
-  SDL_Window *MainWindow = SDL_CreateWindow(
-      "Chonk", 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
-  if(!MainWindow)
-  {
-    std::cerr << "Failed To Create Window: " << SDL_GetError() << std::endl;
-    return -1;
-  }
-
-  SDL_GLContext Context = SDL_GL_CreateContext(MainWindow);
-  if(!Context)
-  {
-    std::cerr << "Failed To Create SDL_GLContext: " << SDL_GetError()
-              << std::endl;
-    return -1;
-  }
-
-  if(SDL_GL_MakeCurrent(MainWindow, Context) < 0)
-  {
-    std::cerr << "Failed To Make Context Current: " << SDL_GetError()
-              << std::endl;
-    SDL_GL_DestroyContext(Context);
-    SDL_DestroyWindow(MainWindow);
-    SDL_Quit();
-    return -1;
-  }
-
-  if(!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress))
-    std::cerr << "Failed To Init Glad: " << SDL_GetError() << std::endl;
+  SDL_Init();
+  Window window(800, 600);
+  Context context(window);
+  GLAD_Init();
 
   bool IsRunning = true;
   SDL_Event Event;
 
   auto startTime = std::chrono::high_resolution_clock::now();
-
-  // opengl init setup
-  glViewport(0, 0, 800, 600);
 
   // shader setup
   Shader defaultShader(
@@ -90,7 +57,7 @@ int main()
          Event.key.scancode == SDL_SCANCODE_F)
       {
         FreeCursor = !FreeCursor;
-        SDL_SetWindowRelativeMouseMode(MainWindow, FreeCursor);
+        SDL_SetWindowRelativeMouseMode(window.Get(), FreeCursor);
       }
       if(Event.type == SDL_EVENT_QUIT)
         IsRunning = false;
@@ -126,14 +93,12 @@ int main()
     chunk.Bind();
     chunk.Draw();
 
-    SDL_GL_SwapWindow(MainWindow);
+    SDL_GL_SwapWindow(window.Get());
 
     std::cout << "FPS: " << (int)fps << " (" << frameTime << " ms)"
               << std::endl;
   }
 
-  SDL_GL_DestroyContext(Context);
-  SDL_DestroyWindow(MainWindow);
   SDL_Quit();
 
   return 0;

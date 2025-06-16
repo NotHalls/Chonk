@@ -9,5 +9,5 @@ Z: 16
 - MS: 8 to 10
 
 ## With Chunking
-- FPS: 350 avg
+- FPS: 350 - 400 avg
 - MS: 2.3 - 2.6 avg
