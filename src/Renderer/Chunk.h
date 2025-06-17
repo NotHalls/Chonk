@@ -24,6 +24,7 @@ public:
   void Unbind();
 
   const glm::vec3 &GetPosition() const { return m_Position; }
+  void SetPosition(const glm::vec3 &pos) { m_Position = pos; }
   const int GetBlockIndex(int x, int y, int z) const;
 
   void Init();

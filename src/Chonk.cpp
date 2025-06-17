@@ -16,27 +16,27 @@
 #include "System/Init.h"
 #include "System/Window.h"
 
+#include "Processes/MainProcess.h"
+#include "System/Scene.h"
+
 int main()
 {
-  SDL_Init();
-  Window window(800, 600);
-  Context context(window);
-  GLAD_Init();
+  MainProcess App;
+  App.OnStart();
 
   bool IsRunning = true;
   SDL_Event Event;
 
-  auto startTime = std::chrono::high_resolution_clock::now();
+  Scene::Init(45.0f, 0.01f, 100.0f, 800, 600);
 
-  // shader setup
-  Shader defaultShader(
-      {{"assets/shaders/Default.vert.glsl", ShaderType::Vertex},
-       {"assets/shaders/Default.frag.glsl", ShaderType::Fragment}});
+  auto startTime = std::chrono::high_resolution_clock::now();
 
   Texture groundTexture("assets/textures/BoxSheet.png");
   /// Graphics Stuff ///
 
   Chunk chunk;
+  Chunk chunk2;
+  chunk2.SetPosition(chunk2.GetPosition() + glm::vec3(20.0f, 0.0f, 0.0f));
   // Mesh mesh(CubeVertices, CubeIndices);
 
   while(IsRunning)
@@ -50,18 +50,27 @@ int main()
 
     while(SDL_PollEvent(&Event))
     {
-      cam.OnEvent(Event);
-
-      // mouse State
-      if(Event.type == SDL_EVENT_KEY_DOWN &&
-         Event.key.scancode == SDL_SCANCODE_F)
-      {
-        FreeCursor = !FreeCursor;
-        SDL_SetWindowRelativeMouseMode(window.Get(), FreeCursor);
-      }
+      Scene::GetCamera()->OnEvent(Event);
+      App.OnEvent(Event);
       if(Event.type == SDL_EVENT_QUIT)
         IsRunning = false;
     }
+    // App.OnUpdate();
+    Scene::GetCamera()->OnUpdate(dt);
+
+    Scene::GetShader()->Bind();
+    groundTexture.Bind(0);
+
+    int uTexLoc = glGetUniformLocation(Scene::GetShader()->Get(), "u_Texture0");
+    glUniform1i(uTexLoc, 0);
+    int uTexsLoc =
+        glGetUniformLocation(Scene::GetShader()->Get(), "u_Textures");
+    int texs[3] = {3, 3, 3};
+    glUniform1iv(uTexsLoc, 3, texs);
+
+    // mesh.Bind();
+    // glDrawElements(GL_TRIANGLES, CubeIndices.size(), GL_UNSIGNED_INT,
+    // nullptr);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -70,30 +79,23 @@ int main()
     glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    cam.OnUpdate(dt);
+    { // draw cycle
+      glm::mat4 model = glm::translate(glm::mat4(1.0f), chunk.GetPosition());
+      glm::mat4 mvp = Scene::GetCamera()->GetVPMatrix() * model;
+      int uMVPLoc = glGetUniformLocation(Scene::GetShader()->Get(), "u_MVP");
+      glUniformMatrix4fv(uMVPLoc, 1, GL_FALSE, glm::value_ptr(mvp));
+      chunk.Bind();
+      chunk.Draw();
 
-    defaultShader.Bind();
-    groundTexture.Bind(0);
+      glm::mat4 model2 = glm::translate(glm::mat4(1.0f), chunk2.GetPosition());
+      glm::mat4 mvp2 = Scene::GetCamera()->GetVPMatrix() * model2;
+      int uMVPLoc2 = glGetUniformLocation(Scene::GetShader()->Get(), "u_MVP");
+      glUniformMatrix4fv(uMVPLoc2, 1, GL_FALSE, glm::value_ptr(mvp2));
+      chunk2.Bind();
+      chunk2.Draw();
+    }
 
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), chunk.GetPosition());
-    glm::mat4 mvp = cam.GetVPMatrix() * model;
-
-    int uTexLoc = glGetUniformLocation(defaultShader.Get(), "u_Texture0");
-    glUniform1i(uTexLoc, 0);
-    int uMVPLoc = glGetUniformLocation(defaultShader.Get(), "u_MVP");
-    glUniformMatrix4fv(uMVPLoc, 1, GL_FALSE, glm::value_ptr(mvp));
-    int uTexsLoc = glGetUniformLocation(defaultShader.Get(), "u_Textures");
-    int texs[3] = {3, 3, 3};
-    glUniform1iv(uTexsLoc, 3, texs);
-
-    // mesh.Bind();
-    // glDrawElements(GL_TRIANGLES, CubeIndices.size(), GL_UNSIGNED_INT,
-    // nullptr);
-
-    chunk.Bind();
-    chunk.Draw();
-
-    SDL_GL_SwapWindow(window.Get());
+    App.GetWindow()->Update();
 
     std::cout << "FPS: " << (int)fps << " (" << frameTime << " ms)"
               << std::endl;

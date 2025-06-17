@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 class SDL_Window;
 
 class Window
@@ -9,6 +11,9 @@ public:
   ~Window();
 
   void Resize(int width, int height);
+  void ToggleCursorLock(bool mode);
+
+  void Update();
 
   void Init();
   SDL_Window *Get() const { return m_Window; }

@@ -1,7 +1,7 @@
 #include "Window.h"
 #include "Debug/Assert.h"
 
-#include <SDL3/SDL_video.h>
+#include <SDL3/SDL.h>
 
 #include <iostream>
 #include <string>
@@ -18,4 +18,16 @@ void Window::Init()
                               SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
   CHK_ASSERT(m_Window,
              "Failed To Create A Window: " + std::string(SDL_GetError()));
+}
+
+void Window::Update() { SDL_GL_SwapWindow(m_Window); }
+
+void Window::Resize(int width, int height)
+{
+  std::cout << "Resized To: " << width << height << "\n";
+}
+
+void Window::ToggleCursorLock(bool mode)
+{
+  SDL_SetWindowRelativeMouseMode(m_Window, mode);
 }

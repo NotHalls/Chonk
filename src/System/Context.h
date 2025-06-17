@@ -1,6 +1,8 @@
 #pragma once
 #include "System/Window.h"
 
+#include <memory>
+
 class Context
 {
 public:
