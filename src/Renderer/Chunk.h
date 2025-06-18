@@ -33,7 +33,7 @@ public:
   void Draw();
 
 private:
-  void addVertices(int x, int y, int z, int faceIndex);
+  void addVertices(int x, int y, int z, int faceIndex, BlockID id);
 
 private:
   uint32_t m_VAO;

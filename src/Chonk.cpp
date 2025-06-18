@@ -57,10 +57,6 @@ int main()
     groundTexture.Bind(0);
     int uTexLoc = glGetUniformLocation(Scene::GetShader()->Get(), "u_Texture0");
     glUniform1i(uTexLoc, 0);
-    int uTexsLoc =
-        glGetUniformLocation(Scene::GetShader()->Get(), "u_Textures");
-    int texs[3] = {3, 3, 3};
-    glUniform1iv(uTexsLoc, 3, texs);
 
     // mesh.Bind();
     // glDrawElements(GL_TRIANGLES, CubeIndices.size(), GL_UNSIGNED_INT,

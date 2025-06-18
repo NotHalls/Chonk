@@ -40,7 +40,7 @@ struct Block
 };
 
 // clang-format off
-static std::unordered_map<BlockID, Block> BlockIDToInfo = {
-  {BlockID::Grass, {BlockID::Grass, 1, 2, 3}}
-};
+// static std::unordered_map<BlockID, Block> BlockIDToInfo = {
+//   {BlockID::Grass, {BlockID::Grass, 1, 2, 3}}
+// };
 // clang-format on

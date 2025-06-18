@@ -14,7 +14,7 @@ struct BaseFaceTemplate
 };
 
 // this is what we push into vertices for each face index
-std::array<BaseFaceTemplate, 6> FaceTemplates = {
+constexpr const std::array<BaseFaceTemplate, 6> FaceTemplates = {
     // Front Face
     BaseFaceTemplate{{glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f),
                       glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)},
@@ -52,6 +52,35 @@ std::array<BaseFaceTemplate, 6> FaceTemplates = {
                      {glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f),
                       glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
                      {2}}};
+constexpr const glm::vec3 GetBlockTextureFromID(BlockID id)
+{
+  // clang-format off
+  switch(id)
+  {
+    case BlockID::None:   return {0, 0, 0};
+    case BlockID::Grass:  return {1, 2, 3};
+    case BlockID::Moss:   return {1, 1, 1};
+    case BlockID::Dirt:   return {3, 3, 3};
+    case BlockID::Stone:  return {4, 4, 4};
+    default: return {0, 0, 0};
+  };
+  // clang-format on
+}
+// this piece of code gives us the uvs for each vertice.
+constexpr const glm::vec2 CalculateTextureUVs(int texID, const glm::vec2 &uvs)
+{
+  const int numRows = 5;
+  const int numCols = 5;
+
+  int col = texID % numCols;
+  int row = texID / numCols;
+
+  glm::vec2 tileOffset =
+      glm::vec2(float(col) / float(numCols), float(row) / float(numRows));
+  glm::vec2 tileScale = glm::vec2(1 / float(numCols), 1 / float(numRows));
+
+  return glm::vec2(tileOffset + uvs * tileScale);
+}
 
 Chunk::Chunk()
 {
@@ -75,10 +104,11 @@ void Chunk::RegenerateChunk()
       for(int z = 0; z < CHUNK_SIZE_Z; z++)
       {
         Block &block = m_Blocks[GetBlockIndex(x, y, z)];
+        block.ID = BlockID::Grass;
 
         for(int faceIndex = 0; faceIndex < 6; faceIndex++)
         {
-          addVertices(x, y, z, faceIndex);
+          addVertices(x, y, z, faceIndex, block.ID);
         }
       }
     }
@@ -86,21 +116,21 @@ void Chunk::RegenerateChunk()
   GenerateMesh();
 }
 
-void Chunk::addVertices(int x, int y, int z, int faceIndex)
+void Chunk::addVertices(int x, int y, int z, int faceIndex, BlockID id)
 {
   glm::vec3 worldPos = m_Position + glm::vec3((float)x, (float)y, (float)z);
-
   // adding vertices
   for(int v = 0; v < 4; v++)
   {
     glm::vec3 pos = FaceTemplates[faceIndex].Positions[v] + worldPos;
-    glm::vec2 uv = FaceTemplates[faceIndex].UVs[v];
+    glm::vec2 verticeUV = CalculateTextureUVs(
+        GetBlockTextureFromID(id)[FaceTemplates[faceIndex].FaceID],
+        FaceTemplates[faceIndex].UVs[v]);
     m_Vertices.push_back(pos.x);
     m_Vertices.push_back(pos.y);
     m_Vertices.push_back(pos.z);
-    m_Vertices.push_back(uv.x);
-    m_Vertices.push_back(uv.y);
-    m_Vertices.push_back((float)FaceTemplates[faceIndex].FaceID);
+    m_Vertices.push_back(verticeUV.x);
+    m_Vertices.push_back(verticeUV.y);
   }
 
   // adding indices
@@ -124,14 +154,11 @@ void Chunk::GenerateMesh()
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_Indices.size() * sizeof(uint32_t),
                m_Indices.data(), GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
                         (void *)(3 * sizeof(float)));
   glEnableVertexAttribArray(1);
-  glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
-                        (void *)(5 * sizeof(float)));
-  glEnableVertexAttribArray(2);
 
   glBindVertexArray(0);
 }
@@ -139,7 +166,8 @@ void Chunk::GenerateMesh()
 void Chunk::Draw()
 {
 #ifdef CHK_DEBUG
-  // std::cout << "VAO: " << m_VAO << ", VBO: " << m_VBO << ", IBO: " << m_IBO
+  // std::cout << "VAO: " << m_VAO << ", VBO: " << m_VBO << ", IBO: " <<
+  // m_IBO
   //           << "\n";
   // std::cout << "Indices size: " << m_Indices.size() << "\n";
 #endif
