@@ -66,7 +66,7 @@ int main()
     // glDrawElements(GL_TRIANGLES, CubeIndices.size(), GL_UNSIGNED_INT,
     // nullptr);
 
-    // App.OnUpdate(dt);
+    App.OnUpdate(dt);
     Scene::GetCamera()->OnUpdate(dt);
     Scene::GetShader()->Bind();
 
@@ -77,8 +77,8 @@ int main()
 
     App.GetWindow()->Update();
 
-    std::cout << "FPS: " << (int)fps << " (" << frameTime << " ms)"
-              << std::endl;
+    // std::cout << "FPS: " << (int)fps << " (" << frameTime << " ms)"
+    //           << std::endl;
   }
 
   SDL_Quit();

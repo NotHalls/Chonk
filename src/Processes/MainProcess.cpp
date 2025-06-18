@@ -1,9 +1,12 @@
 #include "MainProcess.h"
+#include "System/Scene.h"
 
 #include <SDL3/SDL_events.h>
 #include <glad/glad.h>
 
 #include <iostream>
+
+bool lockMouse = false;
 
 void MainProcess::OnStart()
 {
@@ -17,16 +20,25 @@ void MainProcess::OnUpdate(float dt) {}
 
 void MainProcess::OnResize(int width, int height)
 {
-  std::cout << "Resized To: " << width << height << "\n";
+  glViewport(0, 0, width, height);
 }
 
 void MainProcess::OnEvent(SDL_Event &event)
 {
-  if(event.type == SDL_EVENT_KEY_DOWN)
+  switch(event.type)
   {
+  case SDL_EVENT_KEY_DOWN: {
     if(event.key.scancode == SDL_SCANCODE_F)
     {
-      m_Window->ToggleCursorLock(true);
+      lockMouse = !lockMouse;
+      m_Window->ToggleCursorLock(lockMouse);
     }
+    break;
+  }
+  case SDL_EVENT_WINDOW_RESIZED: {
+    OnResize(event.window.data1, event.window.data2);
+    Scene::GetCamera()->OnResize(event.window.data1, event.window.data2);
+    break;
+  }
   }
 }
