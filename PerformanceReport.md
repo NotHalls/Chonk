@@ -57,7 +57,7 @@
 ### 📊 Metrics
 - **Average FPS:** 145  
 - **Average Frame Time:** 6.7 ms  
-- **Average CPU Usage:** 7.5%  
+- **Average CPU Usage:** 3.0%  
 - **Average Memory Usage:** 36.0 MB  
 - **Average GPU Usage:** 15%  
 

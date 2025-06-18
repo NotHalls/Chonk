@@ -73,8 +73,8 @@ int main()
 
     App.GetWindow()->Update();
 
-    // std::cout << "FPS: " << (int)fps << " (" << frameTime << " ms)"
-    //           << std::endl;
+    std::cout << "FPS: " << (int)fps << " (" << frameTime << " ms)"
+              << std::endl;
   }
 
   SDL_Quit();
