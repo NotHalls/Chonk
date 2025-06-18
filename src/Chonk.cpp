@@ -35,9 +35,7 @@ int main()
   /// Graphics Stuff ///
 
   Chunk chunk;
-  Chunk chunk2;
-  chunk2.SetPosition(chunk2.GetPosition() + glm::vec3(20.0f, 0.0f, 0.0f));
-  // Mesh mesh(CubeVertices, CubeIndices);
+  Scene::PushChunk(chunk);
 
   while(IsRunning)
   {
@@ -55,12 +53,8 @@ int main()
       if(Event.type == SDL_EVENT_QUIT)
         IsRunning = false;
     }
-    // App.OnUpdate();
-    Scene::GetCamera()->OnUpdate(dt);
 
-    Scene::GetShader()->Bind();
     groundTexture.Bind(0);
-
     int uTexLoc = glGetUniformLocation(Scene::GetShader()->Get(), "u_Texture0");
     glUniform1i(uTexLoc, 0);
     int uTexsLoc =
@@ -72,28 +66,14 @@ int main()
     // glDrawElements(GL_TRIANGLES, CubeIndices.size(), GL_UNSIGNED_INT,
     // nullptr);
 
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glFrontFace(GL_CCW);
-    glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // App.OnUpdate(dt);
+    Scene::GetCamera()->OnUpdate(dt);
+    Scene::GetShader()->Bind();
 
+    Scene::StartScene();
     { // draw cycle
-      glm::mat4 model = glm::translate(glm::mat4(1.0f), chunk.GetPosition());
-      glm::mat4 mvp = Scene::GetCamera()->GetVPMatrix() * model;
-      int uMVPLoc = glGetUniformLocation(Scene::GetShader()->Get(), "u_MVP");
-      glUniformMatrix4fv(uMVPLoc, 1, GL_FALSE, glm::value_ptr(mvp));
-      chunk.Bind();
-      chunk.Draw();
-
-      glm::mat4 model2 = glm::translate(glm::mat4(1.0f), chunk2.GetPosition());
-      glm::mat4 mvp2 = Scene::GetCamera()->GetVPMatrix() * model2;
-      int uMVPLoc2 = glGetUniformLocation(Scene::GetShader()->Get(), "u_MVP");
-      glUniformMatrix4fv(uMVPLoc2, 1, GL_FALSE, glm::value_ptr(mvp2));
-      chunk2.Bind();
-      chunk2.Draw();
     }
+    Scene::StopScene();
 
     App.GetWindow()->Update();
 

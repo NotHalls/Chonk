@@ -13,7 +13,7 @@ void MainProcess::OnStart()
   GLAD_Init();
 }
 
-void MainProcess::OnUpdate() {}
+void MainProcess::OnUpdate(float dt) {}
 
 void MainProcess::OnResize(int width, int height)
 {

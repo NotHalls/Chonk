@@ -5,6 +5,7 @@ bin/
 bin-lib/
 bin-objs/
 build/
+out/
 test/
 _temp
 

@@ -5,4 +5,4 @@
 
 void ChunkProcess::OnStart() {}
 
-void ChunkProcess::OnUpdate() {}
+void ChunkProcess::OnUpdate(float dt) {}

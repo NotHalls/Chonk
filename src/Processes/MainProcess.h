@@ -12,7 +12,7 @@ class MainProcess : public Process
 {
 public:
   virtual void OnStart() override;
-  virtual void OnUpdate() override;
+  virtual void OnUpdate(float dt) override;
   virtual void OnResize(int width, int height) override;
 
   void OnEvent(SDL_Event &event);
