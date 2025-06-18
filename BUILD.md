@@ -31,11 +31,11 @@ git submodule update --init --recursive
 ```sh
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
 ```
+> **NOTE:** If you want the **Debug** build, then you need to change the `-DCMAKE_BUILD_TYPE=Release` to `-DCMAKE_BUILD_TYPE=Debug`.
 ### For MSVC
 ```sh
 cmake -B build -G "Visual Studio 17 2022"
 ```
-> **NOTE:** If you want the **Debug** build, then for *Clang*, you need to change the `-DCMAKE_BUILD_TYPE=Release` to `-DCMAKE_BUILD_TYPE=Debug`.
 
 ## Compiling:
 - Make sure you are in the root folder of the project
