@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm/glm.hpp>
+
 #include <cstdint>
 #include <string>
 #include <unordered_map>
@@ -22,10 +24,12 @@ public:
   void Unbind();
   const uint32_t Get() const { return m_ID; }
 
+  void SetUniformInt(const std::string &name, int value);
+  void SetUniformMat4(const std::string &name, const glm::mat4 value);
+
 private:
   std::string ReadFile(const std::string &path);
   uint32_t CompileShader(const std::string &source, ShaderType type);
-  void CreateShaderProgram();
 
 private:
   uint32_t m_ID;

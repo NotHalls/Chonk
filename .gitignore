@@ -15,6 +15,3 @@ _temp
 *.user
 *.filters
 *.my.todo
-
-#FILES
-.vscode/settings.json

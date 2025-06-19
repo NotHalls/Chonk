@@ -1,0 +1,13 @@
+{
+  "C_Cpp.default.compileCommands": "${workspaceRoot}/build/Debug_Clang/compile_commands.json",
+  "terminal.integrated.defaultProfile.windows": "Git Bash",
+  "[markdown]": {
+    "editor.formatOnSave": false,
+    "editor.defaultFormatter": null
+  },
+  "files.exclude": {
+    "**/build": true,
+    "**/bin": true,
+    "**/bin-objs": true,
+  },
+}

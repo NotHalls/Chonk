@@ -1,11 +1,15 @@
 #pragma once
 #include <iostream>
 
-#define CHK_ASSERT(x, msg)                                                     \
+#ifdef CHK_DEBUG
+#define CHK_ASSERT(expr, msg)                                                  \
   {                                                                            \
-    if(!(x))                                                                   \
+    if(!(expr))                                                                \
     {                                                                          \
       std::cerr << "ASSERTION CALLED: " + std::string(msg);                    \
       throw std::runtime_error("ASSERTION CALLED: " + std::string(msg));       \
     }                                                                          \
   }
+#else
+#define CHK_ASSERT(expr, msg)
+#endif

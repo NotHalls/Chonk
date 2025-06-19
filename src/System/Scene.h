@@ -3,6 +3,7 @@
 #include "Renderer/Camera.h"
 #include "Renderer/Chunk.h"
 #include "Renderer/Shader.h"
+#include "Renderer/Texture.h"
 
 #include <memory>
 #include <vector>
@@ -25,4 +26,5 @@ private:
   static std::unique_ptr<Shader> m_Shader;
 
   static std::vector<Chunk> m_Chunks;
+  static std::unique_ptr<Texture> m_TextureAtlas;
 };
