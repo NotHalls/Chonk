@@ -27,7 +27,7 @@ public:
   // Camera Changes
   void OnResize(uint32_t width, uint32_t height);
   void OnUpdate(float dt);
-  void OnEvent(SDL_Event &event);
+  void OnEvent(const SDL_Event &event);
 
 private:
   void RecalculateMatrix();

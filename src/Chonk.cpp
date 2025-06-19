@@ -38,6 +38,7 @@ int main()
   }
 
   SDL_Quit();
+  App::Destroy();
 
   return 0;
 }

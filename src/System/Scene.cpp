@@ -50,8 +50,6 @@ void Scene::StopScene()
     chunk.Bind();
     chunk.Draw();
   }
-
-  App::GetWindow()->Update();
 }
 
 void Scene::PushChunk(Chunk chunk) { m_Chunks.push_back(chunk); }

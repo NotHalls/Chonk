@@ -47,7 +47,7 @@ void Camera::OnUpdate(float dt)
   if(keyboard[SDL_SCANCODE_Q])
     SetPosition((m_Position -= m_Up * m_Speed * dt));
 }
-void Camera::OnEvent(SDL_Event &event)
+void Camera::OnEvent(const SDL_Event &event)
 {
   if(event.type == SDL_EVENT_MOUSE_MOTION)
   {
