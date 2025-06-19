@@ -1,10 +1,10 @@
-#include <iostream>
+#include "Texture.h"
 
 #include <SDL3/SDL_surface.h>
 #include <glad/glad.h>
 #include <stb_image.h>
 
-#include "Texture.h"
+#include <iostream>
 
 Texture::Texture(const std::string &file, uint32_t mmLVL)
     : m_File(file), m_Mipmaps(mmLVL)

@@ -1,9 +1,9 @@
 #pragma once
 
+#include <glm/glm.hpp>
+
 #include <cstdint>
 #include <vector>
-
-#include <glm/glm.hpp>
 
 class Mesh
 {

@@ -10,4 +10,7 @@
     "**/bin": true,
     "**/bin-objs": true,
   },
+  "files.associations": {
+    "iostream": "cpp"
+  },
 }

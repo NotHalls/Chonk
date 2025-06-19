@@ -1,10 +1,10 @@
 #pragma once
 
+#include <glm/glm.hpp>
+
 #include <array>
 #include <cstdint>
 #include <unordered_map>
-
-#include <glm/glm.hpp>
 
 // clang-format off
 const glm::ivec3 FaceDirection[6] = {

@@ -1,6 +1,6 @@
-#include <glm/gtc/matrix_transform.hpp>
-
 #include "Camera.h"
+
+#include <glm/gtc/matrix_transform.hpp>
 
 Camera::Camera(float fov, float nearP, float farP, uint32_t width,
                uint32_t height)

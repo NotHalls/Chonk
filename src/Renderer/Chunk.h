@@ -1,12 +1,12 @@
 #pragma once
 
-#include <array>
-#include <cstdint>
-#include <vector>
+#include "Structs/Block.h"
 
 #include <glm/glm.hpp>
 
-#include "Structs/Block.h"
+#include <array>
+#include <cstdint>
+#include <vector>
 
 /// @todo: after optimization tests make Y: 256
 constexpr size_t CHUNK_SIZE_X = 16;

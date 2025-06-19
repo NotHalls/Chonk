@@ -2,6 +2,7 @@
 #include "Debug/Assert.h"
 
 #include <SDL3/SDL_video.h>
+
 #include <iostream>
 
 Context::Context(Window &window) { Init(window); }

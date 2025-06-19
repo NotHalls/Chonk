@@ -1,4 +1,5 @@
 #pragma once
+
 #include "System/Context.h"
 #include "System/Init.h"
 #include "System/Window.h"
