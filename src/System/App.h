@@ -12,19 +12,22 @@
 class App
 {
 public:
-  static void Start();
-  static void Update(float dt);
-  static void OnResize(int width, int height);
-  static void Destroy();
+  App();
+  ~App();
 
-  static void OnEvent(const SDL_Event &event);
+  void Start();
+  void Update(float dt);
+  void OnResize(int width, int height);
 
-  static std::unique_ptr<Window> &GetWindow() { return m_Window; }
-  static std::unique_ptr<Context> &GetContext() { return m_Context; }
+  void OnEvent(const SDL_Event &event);
+
+  static const App &Get() { return *m_App; }
+  const std::unique_ptr<Window> &GetWindow() const { return m_Window; }
+  const std::unique_ptr<Context> &GetContext() const { return m_Context; }
 
 private:
-  static bool m_FreeCursor;
-  static std::unique_ptr<Window> m_Window;
-  static std::unique_ptr<Context> m_Context;
-  static GUI m_Gui;
+  static App *m_App;
+  std::unique_ptr<Window> m_Window;
+  std::unique_ptr<Context> m_Context;
+  GUI m_Gui;
 };

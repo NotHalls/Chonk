@@ -7,7 +7,7 @@
 class GUI : public Process
 {
 public:
-  void Destroy();
+  ~GUI();
 
   virtual void OnStart() override;
   virtual void OnUpdate(float dt) override;

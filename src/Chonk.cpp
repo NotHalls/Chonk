@@ -8,7 +8,7 @@
 
 int main()
 {
-  App::Start();
+  App app;
 
   bool IsRunning = true;
   SDL_Event Event;
@@ -21,24 +21,18 @@ int main()
     std::chrono::duration<float> delta = curtTime - startTime;
     startTime = curtTime;
     float dt = delta.count();
-    float fps = 1 / dt;
-    float frameTime = dt * 1000.0f;
 
     while(SDL_PollEvent(&Event))
     {
-      App::OnEvent(Event);
+      app.OnEvent(Event);
       if(Event.type == SDL_EVENT_QUIT)
         IsRunning = false;
     }
 
-    App::Update(dt);
-
-    std::cout << "FPS: " << (int)fps << " (" << frameTime << " ms)"
-              << std::endl;
+    app.Update(dt);
   }
 
   SDL_Quit();
-  App::Destroy();
 
   return 0;
 }

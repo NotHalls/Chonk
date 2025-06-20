@@ -32,6 +32,11 @@ public:
 private:
   void RecalculateMatrix();
 
+public:
+#ifdef CHK_DEBUG
+  bool LockInput = false;
+#endif
+
 private:
   glm::mat4 m_Projection;
   glm::mat4 m_View;

@@ -8,16 +8,24 @@
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_sdl3.h>
 
+GUI::~GUI()
+{
+  ImGui_ImplOpenGL3_Shutdown();
+  ImGui_ImplSDL3_Shutdown();
+  ImGui::DestroyContext();
+}
+
 void GUI::OnStart()
 {
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO &io = ImGui::GetIO();
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+  io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
   ImGui_ImplSDL3_InitForOpenGL(
-      App::GetWindow()->Get(),
-      static_cast<SDL_GLContext>(App::GetContext()->GetRaw()));
+      App::Get().GetWindow()->Get(),
+      static_cast<SDL_GLContext>(App::Get().GetContext()->GetRaw()));
   ImGui_ImplOpenGL3_Init("#version 460");
 }
 
@@ -34,21 +42,15 @@ void GUI::Begin()
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplSDL3_NewFrame();
   ImGui::NewFrame();
-  ImGui::ShowDemoWindow();
 }
 
 void GUI::End()
 {
-  SDL_GL_MakeCurrent(App::GetWindow()->Get(),
-                     static_cast<SDL_GLContext>(App::GetContext()->GetRaw()));
-
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-}
-
-void GUI::Destroy()
-{
-  ImGui_ImplOpenGL3_Shutdown();
-  ImGui_ImplSDL3_Shutdown();
-  ImGui::DestroyContext();
+  ImGui::UpdatePlatformWindows();
+  ImGui::RenderPlatformWindowsDefault();
+  SDL_GL_MakeCurrent(
+      App::Get().GetWindow()->Get(),
+      static_cast<SDL_GLContext>(App::Get().GetContext()->GetRaw()));
 }

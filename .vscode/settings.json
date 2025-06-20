@@ -9,5 +9,5 @@
     "**/build": true,
     "**/bin": true,
     "**/bin-objs": true,
-  },
+  }
 }
