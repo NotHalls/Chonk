@@ -25,6 +25,9 @@ void Scene::Init(float fov, float nPlane, float fPlane, int width, int height)
   /// should do later on
   Chunk chunk;
   Scene::PushChunk(chunk);
+  Chunk chunk2;
+  chunk2.SetPosition({16, 0, 0});
+  Scene::PushChunk(chunk2);
 }
 
 void Scene::StartScene()

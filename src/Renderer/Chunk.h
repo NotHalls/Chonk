@@ -25,12 +25,15 @@ public:
 
   const glm::vec3 &GetPosition() const { return m_Position; }
   void SetPosition(const glm::vec3 &pos) { m_Position = pos; }
-  const int GetBlockIndex(int x, int y, int z) const;
+  const int GetBlockIndexFromPos(const glm::ivec3 &pos) const;
+  const glm::ivec3 GetBlockPosFromIndex(int index) const;
 
   void Init();
   void RegenerateChunk();
   void GenerateMesh();
   void Draw();
+
+  const bool IsBlockInChunk(const glm::ivec3 &pos) const;
 
 private:
   void addVertices(int x, int y, int z, int faceIndex, BlockID id);
@@ -42,7 +45,8 @@ private:
 
   glm::vec3 m_Position;
 
-  std::array<Block, CHUNK_VOLUME> m_Blocks;
+  // std::array<Block, CHUNK_VOLUME> m_Blocks;
+  std::vector<Block> m_Blocks = std::vector<Block>(CHUNK_VOLUME);
   std::vector<float> m_Vertices;
   std::vector<uint32_t> m_Indices;
   uint32_t m_CurrentVerticeCount = 0;

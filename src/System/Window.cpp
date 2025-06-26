@@ -14,7 +14,12 @@ Window::~Window() { SDL_DestroyWindow(m_Window); }
 
 void Window::Init()
 {
-  m_Window = SDL_CreateWindow("Chonk", m_Width, m_Height,
+#ifdef CHK_DEBUG
+  const char *windowName = "Chonk - Debug";
+#elif CHK_RELEASE
+  const char *windowName = "Chonk - Release";
+#endif
+  m_Window = SDL_CreateWindow(windowName, m_Width, m_Height,
                               SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
   CHK_ASSERT(m_Window,
              "Failed To Create A Window: " + std::string(SDL_GetError()));

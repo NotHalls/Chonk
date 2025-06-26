@@ -1,4 +1,5 @@
 #include "App.h"
+#include "Renderer/GladFunctions.h"
 #include "System/Scene.h"
 
 #include <SDL3/SDL_events.h>
@@ -13,8 +14,21 @@ static bool lockMouse = false;
 static float avgFps = 0.0f;
 static float avgFrameTime = 0.0f;
 static float avgFrequency = 0.02f;
+static bool wireframeMode = true;
 
 // file functions
+static void DisplaySettingsGUI()
+{
+  ToggleWireframeMode(wireframeMode);
+  ImGui::Begin("Settings");
+  if(ImGui::Button("Toggle Wireframe"))
+  {
+    wireframeMode = !wireframeMode;
+    ToggleWireframeMode(wireframeMode);
+  }
+  ImGui::End();
+}
+
 static inline void DisplayStatsGUI(float dt)
 {
 #ifdef CHK_DEBUG
@@ -66,6 +80,7 @@ void App::Update(float dt)
   Scene::StopScene();
 
   DisplayStatsGUI(dt);
+  DisplaySettingsGUI();
 
   GUI::End();
   m_Window->Update();

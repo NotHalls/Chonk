@@ -1,6 +1,7 @@
 #include "Chunk.h"
 
 #include <glad/glad.h>
+#include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
@@ -11,6 +12,19 @@ struct BaseFaceTemplate
   glm::vec2 UVs[4];
   uint8_t FaceID;
 };
+
+// clang-format off
+// this is a set of values that tell us what side to add or sub according to
+// the index. (used for greedy meshing)
+constexpr const glm::ivec3 BlockFaceIndex[6] = {
+  { 0,  0, -1},  // Front
+  { 0,  0,  1},  // Back
+  {-1,  0,  0},  // Left
+  { 1,  0,  0},  // Right
+  { 0,  1,  0},  // Top
+  { 0, -1,  0}   // Bottom
+};
+// clang-format on
 
 // this is what we push into vertices for each face index
 constexpr const std::array<BaseFaceTemplate, 6> FaceTemplates = {
@@ -96,20 +110,32 @@ void Chunk::Init()
 
 void Chunk::RegenerateChunk()
 {
-  for(int y = 0; y < CHUNK_SIZE_Y; y++)
+  for(int i = 0; i < CHUNK_VOLUME; i++)
   {
-    for(int x = 0; x < CHUNK_SIZE_X; x++)
-    {
-      for(int z = 0; z < CHUNK_SIZE_Z; z++)
-      {
-        Block &block = m_Blocks[GetBlockIndex(x, y, z)];
-        block.ID = BlockID::Grass;
+    m_Blocks[i].ID = BlockID::Grass;
+  }
+  for(int i = 0; i < CHUNK_VOLUME; i++)
+  {
 
-        for(int faceIndex = 0; faceIndex < 6; faceIndex++)
-        {
-          addVertices(x, y, z, faceIndex, block.ID);
-        }
+    Block &block = m_Blocks[i];
+    for(int faceIndex = 0; faceIndex < 6; faceIndex++)
+    {
+      // the faceIndex's index being:
+      // 0 - Front
+      // 1 - Back
+      // 2 - Left
+      // 3 - Right
+      // 4 - Top
+      // 5 - Bottom
+      glm::ivec3 pos = GetBlockPosFromIndex(i);
+      glm::ivec3 checkPos = pos + BlockFaceIndex[faceIndex];
+      if(!IsBlockInChunk(checkPos))
+      {
+        // check for neighbouring chunk
       }
+      else if(m_Blocks[GetBlockIndexFromPos(checkPos)].ID != BlockID::None)
+        continue;
+      addVertices(pos.x, pos.y, pos.z, faceIndex, block.ID);
     }
   }
   GenerateMesh();
@@ -177,7 +203,29 @@ void Chunk::Draw()
 void Chunk::Bind() { glBindVertexArray(m_VAO); }
 void Chunk::Unbind() { glBindVertexArray(0); }
 
-const int Chunk::GetBlockIndex(int x, int y, int z) const
+const int Chunk::GetBlockIndexFromPos(const glm::ivec3 &pos) const
 {
-  return x + CHUNK_SIZE_Z * (z + CHUNK_SIZE_X * y);
+  // we push blocks into the chunk in this order: x -> z -> y
+  // so the above formula is basicly
+  // x + (CHUNK_SIZE_X * z) + (CHUNK_SIZE_X * CHUNK_SIZE_Z * y)
+
+  return pos.x + CHUNK_SIZE_Z * (pos.z + CHUNK_SIZE_X * pos.y);
 }
+
+const glm::ivec3 Chunk::GetBlockPosFromIndex(int index) const
+{
+  int y = index / (CHUNK_SIZE_Z * CHUNK_SIZE_X);
+  int remainder = index % (CHUNK_SIZE_Z * CHUNK_SIZE_X);
+  int z = remainder / CHUNK_SIZE_Z;
+  int x = remainder % CHUNK_SIZE_Z;
+  return {x, y, z};
+}
+
+// clang-format off
+const bool Chunk::IsBlockInChunk(const glm::ivec3 &pos) const
+{
+  return pos.x >= 0 && pos.x < CHUNK_SIZE_X &&
+         pos.y >= 0 && pos.y < CHUNK_SIZE_Y &&
+         pos.z >= 0 && pos.z < CHUNK_SIZE_Z;
+}
+// clang-format on
