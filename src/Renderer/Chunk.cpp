@@ -1,4 +1,5 @@
 #include "Chunk.h"
+#include "Debug/GLError.h"
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -100,20 +101,29 @@ Chunk::Chunk()
   Init();
   RegenerateChunk();
 }
+Chunk::~Chunk()
+{
+  CheckGLErrors(glDeleteBuffers(1, &m_VBO));
+  CheckGLErrors(glDeleteBuffers(1, &m_IBO));
+  CheckGLErrors(glDeleteVertexArrays(1, &m_VAO));
+}
 
 void Chunk::Init()
 {
-  glCreateVertexArrays(1, &m_VAO);
-  glCreateBuffers(1, &m_VBO);
-  glCreateBuffers(1, &m_IBO);
+  CheckGLErrors(glCreateVertexArrays(1, &m_VAO));
+  CheckGLErrors(glCreateBuffers(1, &m_VBO));
+  CheckGLErrors(glCreateBuffers(1, &m_IBO));
 }
 
 void Chunk::RegenerateChunk()
 {
+  // generating the chunk
   for(int i = 0; i < CHUNK_VOLUME; i++)
   {
     m_Blocks[i].ID = BlockID::Grass;
   }
+
+  // pushing the block vertices into a buffer
   for(int i = 0; i < CHUNK_VOLUME; i++)
   {
 
@@ -170,34 +180,37 @@ void Chunk::addVertices(int x, int y, int z, int faceIndex, BlockID id)
 
 void Chunk::GenerateMesh()
 {
-  glBindVertexArray(m_VAO);
+  CheckGLErrors(glBindVertexArray(m_VAO));
 
-  glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-  glBufferData(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(float),
-               m_Vertices.data(), GL_STATIC_DRAW);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_Indices.size() * sizeof(uint32_t),
-               m_Indices.data(), GL_STATIC_DRAW);
+  CheckGLErrors(glBindBuffer(GL_ARRAY_BUFFER, m_VBO));
+  CheckGLErrors(glBufferData(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(float),
+                             m_Vertices.data(), GL_STATIC_DRAW));
+  CheckGLErrors(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO));
+  CheckGLErrors(glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                             m_Indices.size() * sizeof(uint32_t),
+                             m_Indices.data(), GL_STATIC_DRAW));
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-                        (void *)(3 * sizeof(float)));
-  glEnableVertexAttribArray(1);
+  CheckGLErrors(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+                                      5 * sizeof(float), (void *)0));
+  CheckGLErrors(glEnableVertexAttribArray(0));
+  CheckGLErrors(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
+                                      5 * sizeof(float),
+                                      (void *)(3 * sizeof(float))));
+  CheckGLErrors(glEnableVertexAttribArray(1));
 
-  glBindVertexArray(0);
+  CheckGLErrors(glBindVertexArray(0));
 }
 
 void Chunk::Draw()
 {
-#ifdef CHK_DEBUG
-  // std::cout << "VAO: " << m_VAO << ", VBO: " << m_VBO << ", IBO: " <<
-  // m_IBO
-  //           << "\n";
-  // std::cout << "Indices size: " << m_Indices.size() << "\n";
-#endif
+  // #ifdef CHK_DEBUG
+  //   std::cout << "VAO: " << m_VAO << ", VBO: " << m_VBO << ", IBO: " << m_IBO
+  //             << "\n";
+  //   std::cout << "Indices size: " << m_Indices.size() << "\n";
+  // #endif
 
-  glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, nullptr);
+  CheckGLErrors(
+      glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, nullptr));
 }
 
 void Chunk::Bind() { glBindVertexArray(m_VAO); }

@@ -4,7 +4,7 @@
 #include <vector>
 
 // clang-format off
-std::vector<float> CubeVertices = {// 6 faces × 4 vertices per face = 24 vertices
+std::vector<float> __CubeVertices__ = {// 6 faces × 4 vertices per face = 24 vertices
   // positions          // UVs       // FaceID
   // Front face
   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,  1.0f,
@@ -43,7 +43,7 @@ std::vector<float> CubeVertices = {// 6 faces × 4 vertices per face = 24 vertic
   -0.5f, -0.5f, -0.5f,  1.0f, 1.0f,  2.0f
 };
 
-std::vector<uint32_t> CubeIndices = {
+std::vector<uint32_t> __CubeIndices__ = {
   // Front face (looking toward +Z)
   0, 1, 2,
   2, 3, 0,

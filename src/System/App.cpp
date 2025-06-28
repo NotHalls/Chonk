@@ -14,7 +14,7 @@ static bool lockMouse = false;
 static float avgFps = 0.0f;
 static float avgFrameTime = 0.0f;
 static float avgFrequency = 0.02f;
-static bool wireframeMode = true;
+static bool wireframeMode = false;
 
 // file functions
 static void DisplaySettingsGUI()
@@ -66,7 +66,7 @@ void App::Start()
   GLAD_Init();
   m_Gui.OnStart();
 
-  Scene::Init(45.0f, 0.01f, 100.0f, 1280, 720);
+  Scene::Init(45.0f, 0.01f, 1000.0f, 1280, 720);
   OnResize(1280, 720);
 }
 

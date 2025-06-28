@@ -18,7 +18,7 @@ class Chunk
 {
 public:
   Chunk();
-  ~Chunk() {}
+  ~Chunk();
 
   void Bind();
   void Unbind();

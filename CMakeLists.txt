@@ -85,3 +85,6 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E
     "${CMAKE_SOURCE_DIR}/assets"
     "${CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CONFIG_UPPER}}/assets"
 )
+
+# target_compile_options(${PROJECT_NAME} PRIVATE -fsanitize=address -g)
+# target_link_options(${PROJECT_NAME} PRIVATE -fsanitize=address)
