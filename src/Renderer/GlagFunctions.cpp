@@ -4,15 +4,8 @@
 
 void ToggleWireframeMode(bool value)
 {
-  switch(value)
-  {
-  case true: {
+  if(value == true)
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    break;
-  }
-  case false: {
+  else if(value == false)
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    break;
-  }
-  }
 }

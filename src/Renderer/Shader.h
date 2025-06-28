@@ -22,7 +22,7 @@ public:
 
   void Bind();
   void Unbind();
-  const uint32_t Get() const { return m_ID; }
+  uint32_t Get() const { return m_ID; }
 
   void SetUniformInt(const std::string &name, int value);
   void SetUniformMat4(const std::string &name, const glm::mat4 value);

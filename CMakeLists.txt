@@ -37,6 +37,7 @@ add_subdirectory(./submodules/sdl)
 
 add_library(glad STATIC submodules/glad/src/glad.c)
 target_include_directories(glad PUBLIC submodules/glad/include)
+target_compile_options(glad PUBLIC -w -Wno-language-extension-token)
 
 add_library(imgui STATIC
     submodules/imgui/imconfig.h
@@ -74,6 +75,18 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ./src
     ./src/include
 )
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(${PROJECT_NAME} PRIVATE
+        $<$<CONFIG:Debug>:-Wall -Wextra -Wpedantic -Wno-unused-parameter>
+        $<$<CONFIG:Release>:-Wall -Wextra -Wpedantic -Wno-unused-parameter>
+    )
+elseif(MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE
+        $<$<CONFIG:Debug>:/W4>
+        $<$<CONFIG:Release>:/W4>
+    )
+endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 imgui glad)
 

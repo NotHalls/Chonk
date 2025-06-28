@@ -12,7 +12,7 @@
 std::unique_ptr<Camera> Scene::m_Camera = nullptr;
 std::unique_ptr<Shader> Scene::m_Shader = nullptr;
 std::unique_ptr<Texture> Scene::m_TextureAtlas = nullptr;
-std::vector<std::shared_ptr<Chunk>> Scene::m_Chunks = {};
+std::vector<std::shared_ptr<Chunk>> Scene::m_Chunks;
 
 void Scene::Init(float fov, float nPlane, float fPlane, int width, int height)
 {
@@ -31,27 +31,15 @@ void Scene::Init(float fov, float nPlane, float fPlane, int width, int height)
 
   /// @temp: pushing chunks into the vector is what the random generator
   /// should do later on
-  // for(int i = 0; i < 16 * 10; i += 16)
-  // {
-  //   for(int j = 0; j < 16 * 10; j += 16)
-  //   {
-  //     std::shared_ptr<Chunk> chunk = std::make_shared<Chunk>();
-  //     chunk->SetPosition({float(i), 0.0f, float(j)});
-  //     Scene::PushChunk(chunk);
-  //   }
-  // }
-  std::shared_ptr<Chunk> chunk1 = std::make_shared<Chunk>();
-  chunk1->SetPosition({0.0f, 0.0f, 0.0f});
-  Scene::PushChunk(chunk1);
-  // std::shared_ptr<Chunk> chunk2 = std::make_shared<Chunk>();
-  // chunk2->SetPosition({0.0f, 0.0f, 16.0f});
-  // Scene::PushChunk(chunk2);
-  // std::shared_ptr<Chunk> chunk3 = std::make_shared<Chunk>();
-  // chunk3->SetPosition({0.0f, 0.0f, 32.0f});
-  // Scene::PushChunk(chunk3);
-  // std::shared_ptr<Chunk> chunk4 = std::make_shared<Chunk>();
-  // chunk4->SetPosition({0.0f, 0.0f, 48.0f});
-  // Scene::PushChunk(chunk4);
+  for(int i = 0; i < 16 * 10; i += 16)
+  {
+    for(int j = 0; j < 16 * 10; j += 16)
+    {
+      std::shared_ptr<Chunk> chunk = std::make_shared<Chunk>();
+      chunk->SetPosition(glm::vec3(float(i), 0.0f, float(j)));
+      Scene::PushChunk(chunk);
+    }
+  }
 }
 
 void Scene::StartScene()

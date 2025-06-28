@@ -10,18 +10,17 @@ Context::~Context() { SDL_GL_DestroyContext((SDL_GLContext)m_Context); }
 
 void Context::Init(Window &window)
 {
-  SDL_GLContext context = SDL_GL_CreateContext(window.Get());
+  SDL_GLContext context =
+      SDL_GL_CreateContext(static_cast<SDL_Window *>(window.GetRaw()));
   CHK_ASSERT(context,
              "Failed To Create SDL_GLContext: " + std::string(SDL_GetError()));
 
-  if(SDL_GL_MakeCurrent(window.Get(), context) < 0)
+  if(!SDL_GL_MakeCurrent(static_cast<SDL_Window *>(window.GetRaw()), context))
   {
     SDL_GL_DestroyContext(context);
-    SDL_DestroyWindow(window.Get());
+    SDL_DestroyWindow(static_cast<SDL_Window *>(window.GetRaw()));
     CHK_ASSERT(true, "Failed To Make GL Context Current: " +
                          std::string(SDL_GetError()));
   }
   m_Context = context;
 }
-
-void *Context::GetRaw() const { return (SDL_GLContext)m_Context; }

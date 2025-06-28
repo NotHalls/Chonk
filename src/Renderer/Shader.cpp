@@ -4,7 +4,6 @@
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
-
 #include <fstream>
 #include <iostream>
 #include <sstream>

@@ -34,38 +34,38 @@ constexpr const std::array<BaseFaceTemplate, 6> FaceTemplates = {
                       glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)},
                      {glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f),
                       glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-                     {1}},
+                     1},
 
     // Back Face
     BaseFaceTemplate{{glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f),
                       glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f)},
                      {glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f),
                       glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-                     {1}},
+                     1},
     // Left Face
     BaseFaceTemplate{{glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f),
                       glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 1.0f)},
                      {glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f),
                       glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-                     {1}},
+                     1},
     // Right Face
     BaseFaceTemplate{{glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 1.0f),
                       glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 0.0f)},
                      {glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f),
                       glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-                     {1}},
+                     1},
     // Top Face
     BaseFaceTemplate{{glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 0.0f),
                       glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f)},
                      {glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f),
                       glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-                     {0}},
+                     0},
     // Bottom Face
     BaseFaceTemplate{{glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
                       glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f)},
                      {glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f),
                       glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-                     {2}}};
+                     2}};
 constexpr const glm::vec3 GetBlockTextureFromID(BlockID id)
 {
   // clang-format off
@@ -96,7 +96,7 @@ constexpr const glm::vec2 CalculateTextureUVs(int texID, const glm::vec2 &uvs)
   return glm::vec2(tileOffset + uvs * tileScale);
 }
 
-Chunk::Chunk()
+Chunk::Chunk() : m_Position(0.0f, 0.0f, 0.0f)
 {
   Init();
   RegenerateChunk();
@@ -118,13 +118,13 @@ void Chunk::Init()
 void Chunk::RegenerateChunk()
 {
   // generating the chunk
-  for(int i = 0; i < CHUNK_VOLUME; i++)
+  for(int i = 0; i < int(CHUNK_VOLUME); i++)
   {
     m_Blocks[i].ID = BlockID::Grass;
   }
 
   // pushing the block vertices into a buffer
-  for(int i = 0; i < CHUNK_VOLUME; i++)
+  for(int i = 0; i < int(CHUNK_VOLUME); i++)
   {
 
     Block &block = m_Blocks[i];
@@ -216,7 +216,7 @@ void Chunk::Draw()
 void Chunk::Bind() { glBindVertexArray(m_VAO); }
 void Chunk::Unbind() { glBindVertexArray(0); }
 
-const int Chunk::GetBlockIndexFromPos(const glm::ivec3 &pos) const
+int Chunk::GetBlockIndexFromPos(const glm::ivec3 &pos) const
 {
   // we push blocks into the chunk in this order: x -> z -> y
   // so the above formula is basicly
@@ -225,7 +225,7 @@ const int Chunk::GetBlockIndexFromPos(const glm::ivec3 &pos) const
   return pos.x + CHUNK_SIZE_Z * (pos.z + CHUNK_SIZE_X * pos.y);
 }
 
-const glm::ivec3 Chunk::GetBlockPosFromIndex(int index) const
+glm::ivec3 Chunk::GetBlockPosFromIndex(int index) const
 {
   int y = index / (CHUNK_SIZE_Z * CHUNK_SIZE_X);
   int remainder = index % (CHUNK_SIZE_Z * CHUNK_SIZE_X);
@@ -235,10 +235,10 @@ const glm::ivec3 Chunk::GetBlockPosFromIndex(int index) const
 }
 
 // clang-format off
-const bool Chunk::IsBlockInChunk(const glm::ivec3 &pos) const
+bool Chunk::IsBlockInChunk(const glm::ivec3 &pos) const
 {
-  return pos.x >= 0 && pos.x < CHUNK_SIZE_X &&
-         pos.y >= 0 && pos.y < CHUNK_SIZE_Y &&
-         pos.z >= 0 && pos.z < CHUNK_SIZE_Z;
+  return pos.x >= 0 && pos.x < int(CHUNK_SIZE_X) &&
+         pos.y >= 0 && pos.y < int(CHUNK_SIZE_Y) &&
+         pos.z >= 0 && pos.z < int(CHUNK_SIZE_Z);
 }
 // clang-format on

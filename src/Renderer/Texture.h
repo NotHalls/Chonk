@@ -8,7 +8,7 @@ class Texture
 public:
   Texture(const std::string &file, uint32_t mipmapLvl = 1);
 
-  const uint32_t Get() const { return m_ID; }
+  uint32_t Get() const { return m_ID; }
   const std::string &GetFile() const { return m_File; }
 
   void Bind(uint32_t slot = 0);

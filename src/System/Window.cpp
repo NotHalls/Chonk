@@ -10,7 +10,7 @@ Window::Window(int width, int height) : m_Width(width), m_Height(height)
 {
   Init();
 }
-Window::~Window() { SDL_DestroyWindow(m_Window); }
+Window::~Window() { SDL_DestroyWindow(static_cast<SDL_Window *>(m_Window)); }
 
 void Window::Init()
 {
@@ -25,7 +25,10 @@ void Window::Init()
              "Failed To Create A Window: " + std::string(SDL_GetError()));
 }
 
-void Window::Update() { SDL_GL_SwapWindow(m_Window); }
+void Window::Update()
+{
+  SDL_GL_SwapWindow(static_cast<SDL_Window *>(m_Window));
+}
 
 void Window::Resize(int width, int height)
 {
@@ -34,5 +37,5 @@ void Window::Resize(int width, int height)
 
 void Window::ToggleCursorLock(bool mode)
 {
-  SDL_SetWindowRelativeMouseMode(m_Window, mode);
+  SDL_SetWindowRelativeMouseMode(static_cast<SDL_Window *>(m_Window), mode);
 }
