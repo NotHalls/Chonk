@@ -11,7 +11,6 @@ enum class ShaderType : uint8_t
   Unknown = 0,
   Vertex = 1,
   Fragment = 2,
-  Geometry = 3
 };
 
 class Shader
@@ -26,6 +25,8 @@ public:
 
   void SetUniformInt(const std::string &name, int value);
   void SetUniformMat4(const std::string &name, const glm::mat4 value);
+
+  std::string ShaderTypeToName(ShaderType type);
 
 private:
   std::string ReadFile(const std::string &path);

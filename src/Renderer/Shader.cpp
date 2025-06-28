@@ -15,7 +15,6 @@ GLenum ToGlShaderType(ShaderType type)
   {
     case ShaderType::Vertex:    return GL_VERTEX_SHADER;
     case ShaderType::Fragment:  return GL_FRAGMENT_SHADER;
-    case ShaderType::Geometry:  return GL_GEOMETRY_SHADER;
     case ShaderType::Unknown:   return GL_INVALID_ENUM;
   }
   // clang-format on
@@ -40,7 +39,7 @@ Shader::Shader(const std::unordered_map<std::string, ShaderType> &files)
   {
     char errMsg[512];
     glGetProgramInfoLog(m_ID, 512, nullptr, errMsg);
-    std::cerr << "Failed To Link Shader!\n" << errMsg << std::endl;
+    CHK_ASSERT(false, "Failed To Link Shader!\n" + std::string(errMsg));
   }
 }
 Shader::~Shader() { glDeleteProgram(m_ID); }
@@ -48,11 +47,8 @@ Shader::~Shader() { glDeleteProgram(m_ID); }
 std::string Shader::ReadFile(const std::string &path)
 {
   std::ifstream file(path);
-  if(!file.is_open())
-  {
-    std::cerr << "Failed To Load Shader: " << path << std::endl;
-    return "";
-  }
+  CHK_ASSERT(file.is_open(),
+             "Failed To Read The Shader File: " + std::string(path));
 
   std::stringstream shaderContent;
   shaderContent << file.rdbuf();
@@ -72,12 +68,25 @@ uint32_t Shader::CompileShader(const std::string &source, ShaderType type)
   {
     char errorMsg[512];
     glGetShaderInfoLog(shader, 512, nullptr, errorMsg);
-    std::cerr << "Failed To Compile " << (int)type << " Shader!\n"
-              << errorMsg << std::endl;
+    CHK_ASSERT(false, "Failed To Compile " + ShaderTypeToName(type) +
+                          std::string(" Shader!\n") + std::string(errorMsg));
   }
 
   return shader;
 }
+
+// clang-format off
+std::string Shader::ShaderTypeToName(ShaderType type)
+{
+  switch(type)
+  {
+  case ShaderType::Unknown: return "Unknown";
+  case ShaderType::Vertex: return "Vertex";
+  case ShaderType::Fragment: return "Fragment";
+  default: "Failed To Get ShaderType String From The Given Type";
+  }
+}
+// clang-format on
 
 void Shader::Bind() { glUseProgram(m_ID); }
 void Shader::Unbind() { glUseProgram(0); }

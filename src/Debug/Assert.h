@@ -12,5 +12,11 @@
     }                                                                          \
   }
 #else
-#define CHK_ASSERT(expr, msg)
+#define CHK_ASSERT(expr, msg)                                                  \
+  {                                                                            \
+    if(!(expr))                                                                \
+    {                                                                          \
+      std::cerr << "ASSERTION WARNING: " + std::string(msg);                   \
+    }                                                                          \
+  }
 #endif

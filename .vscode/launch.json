@@ -7,7 +7,7 @@
             "type": "cppvsdbg",
             "cwd": "${workspaceFolder}",
             "program": "bin/Windows-Debug-Clang/Chonk.exe",
-            "console": "integratedTerminal",
+            "console": "newExternalWindow",
             "preLaunchTask": "Clang Build Debug",
         },
         {
@@ -16,7 +16,7 @@
             "type": "cppvsdbg",
             "cwd": "${workspaceFolder}",
             "program": "bin/Windows-Release-Clang/Chonk.exe",
-            "console": "integratedTerminal",
+            "console": "newExternalWindow",
             "preLaunchTask": "Clang Build Release",
         },
         {
@@ -25,7 +25,7 @@
             "type": "cppvsdbg",
             "cwd": "${workspaceFolder}",
             "program": "bin/Windows-Export-Clang/Chonk.exe",
-            "console": "integratedTerminal",
+            "console": "newExternalWindow",
             "preLaunchTask": "Clang Build Export",
         },
         // MSVC stuff //
@@ -35,7 +35,7 @@
             "type": "cppvsdbg",
             "cwd": "${workspaceFolder}",
             "program": "bin/Windows-Debug-MSVC/Chonk.exe",
-            "console": "integratedTerminal",
+            "console": "newExternalWindow",
             "preLaunchTask": "MSVC Build Debug",
         },
         {
@@ -44,7 +44,7 @@
             "type": "cppvsdbg",
             "cwd": "${workspaceFolder}",
             "program": "bin/Windows-Release-MSVC/Chonk.exe",
-            "console": "integratedTerminal",
+            "console": "newExternalWindow",
             "preLaunchTask": "MSVC Build Release",
         },
         {
@@ -53,7 +53,7 @@
             "type": "cppvsdbg",
             "cwd": "${workspaceFolder}",
             "program": "bin/Windows-Export-MSVC/Chonk.exe",
-            "console": "integratedTerminal",
+            "console": "newExternalWindow",
             "preLaunchTask": "MSVC Build Export",
         }
     ]
