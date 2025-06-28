@@ -18,22 +18,22 @@ class Chunk
 {
 public:
   Chunk();
-  ~Chunk() {}
+  ~Chunk();
 
   void Bind();
   void Unbind();
 
   const glm::vec3 &GetPosition() const { return m_Position; }
   void SetPosition(const glm::vec3 &pos) { m_Position = pos; }
-  const int GetBlockIndexFromPos(const glm::ivec3 &pos) const;
-  const glm::ivec3 GetBlockPosFromIndex(int index) const;
+  int GetBlockIndexFromPos(const glm::ivec3 &pos) const;
+  glm::ivec3 GetBlockPosFromIndex(int index) const;
 
   void Init();
   void RegenerateChunk();
   void GenerateMesh();
   void Draw();
 
-  const bool IsBlockInChunk(const glm::ivec3 &pos) const;
+  bool IsBlockInChunk(const glm::ivec3 &pos) const;
 
 private:
   void addVertices(int x, int y, int z, int faceIndex, BlockID id);

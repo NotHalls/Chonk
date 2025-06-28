@@ -24,7 +24,7 @@ void GUI::OnStart()
   io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
   ImGui_ImplSDL3_InitForOpenGL(
-      App::Get().GetWindow()->Get(),
+      static_cast<SDL_Window *>(App::Get().GetWindow()->GetRaw()),
       static_cast<SDL_GLContext>(App::Get().GetContext()->GetRaw()));
   ImGui_ImplOpenGL3_Init("#version 460");
 }
@@ -51,6 +51,6 @@ void GUI::End()
   ImGui::UpdatePlatformWindows();
   ImGui::RenderPlatformWindowsDefault();
   SDL_GL_MakeCurrent(
-      App::Get().GetWindow()->Get(),
+      static_cast<SDL_Window *>(App::Get().GetWindow()->GetRaw()),
       static_cast<SDL_GLContext>(App::Get().GetContext()->GetRaw()));
 }

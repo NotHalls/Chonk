@@ -19,12 +19,12 @@ public:
   static void StartScene();
   static void StopScene();
 
-  static void PushChunk(Chunk chunk);
+  static void PushChunk(const std::shared_ptr<Chunk> &chunk);
 
 private:
   static std::unique_ptr<Camera> m_Camera;
   static std::unique_ptr<Shader> m_Shader;
 
-  static std::vector<Chunk> m_Chunks;
+  static std::vector<std::shared_ptr<Chunk>> m_Chunks;
   static std::unique_ptr<Texture> m_TextureAtlas;
 };

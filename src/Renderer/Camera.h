@@ -11,9 +11,9 @@ public:
 
   const glm::mat4 &GetVPMatrix() const { return m_ProjectionView; }
   const glm::vec3 &GetTransform() const { return m_Position; }
-  const float GetFOV() const { return m_FOV; }
-  const float GetNearPlane() const { return m_NearPlane; }
-  const float GetFatPlane() const { return m_FarPlane; }
+  float GetFOV() const { return m_FOV; }
+  float GetNearPlane() const { return m_NearPlane; }
+  float GetFatPlane() const { return m_FarPlane; }
 
   const glm::vec3 &GetForward() const { return m_Forward; }
   const glm::vec3 &GetUp() const { return m_Up; }

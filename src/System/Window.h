@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-class SDL_Window;
+// class SDL_Window;
 
 class Window
 {
@@ -16,9 +16,9 @@ public:
   void Update();
 
   void Init();
-  SDL_Window *Get() const { return m_Window; }
+  void *GetRaw() const { return m_Window; }
 
 private:
-  SDL_Window *m_Window;
+  void *m_Window;
   int m_Width, m_Height;
 };

@@ -4,7 +4,7 @@
 
 Mesh::Mesh(const std::vector<float> &vertices,
            const std::vector<uint32_t> &indices, const glm::vec3 &pos)
-    : m_Vertices(vertices), m_Indices(indices), m_Position(pos)
+    : m_Position(pos), m_Vertices(vertices), m_Indices(indices)
 {
   Init();
 }

@@ -1,3 +1,4 @@
+#include "Debug/Assert.h"
 #include "Texture.h"
 
 #include <SDL3/SDL_surface.h>
@@ -26,7 +27,7 @@ void Texture::ProcessTexture()
   m_Width = width;
   m_Height = height;
 
-  int internalFormat, imageFormat;
+  int internalFormat = -1, imageFormat = -1;
   if(channels == 4)
   {
     internalFormat = GL_RGBA8;
@@ -37,6 +38,8 @@ void Texture::ProcessTexture()
     internalFormat = GL_RGB8;
     imageFormat = GL_RGB;
   }
+  CHK_ASSERT(internalFormat >= 0 || imageFormat >= 0,
+             "Unable To Extract Image Formats From Texture");
 
   // creating the texture from data in memory
   glCreateTextures(GL_TEXTURE_2D, 1, &m_ID);

@@ -1,4 +1,5 @@
 #include "Chunk.h"
+#include "Debug/GLError.h"
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -33,38 +34,38 @@ constexpr const std::array<BaseFaceTemplate, 6> FaceTemplates = {
                       glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)},
                      {glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f),
                       glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-                     {1}},
+                     1},
 
     // Back Face
     BaseFaceTemplate{{glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f),
                       glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f)},
                      {glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f),
                       glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-                     {1}},
+                     1},
     // Left Face
     BaseFaceTemplate{{glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f),
                       glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 1.0f)},
                      {glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f),
                       glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-                     {1}},
+                     1},
     // Right Face
     BaseFaceTemplate{{glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 1.0f),
                       glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 0.0f)},
                      {glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f),
                       glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-                     {1}},
+                     1},
     // Top Face
     BaseFaceTemplate{{glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 0.0f),
                       glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f)},
                      {glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f),
                       glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-                     {0}},
+                     0},
     // Bottom Face
     BaseFaceTemplate{{glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
                       glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f)},
                      {glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f),
                       glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-                     {2}}};
+                     2}};
 constexpr const glm::vec3 GetBlockTextureFromID(BlockID id)
 {
   // clang-format off
@@ -95,26 +96,35 @@ constexpr const glm::vec2 CalculateTextureUVs(int texID, const glm::vec2 &uvs)
   return glm::vec2(tileOffset + uvs * tileScale);
 }
 
-Chunk::Chunk()
+Chunk::Chunk() : m_Position(0.0f, 0.0f, 0.0f)
 {
   Init();
   RegenerateChunk();
 }
+Chunk::~Chunk()
+{
+  CheckGLErrors(glDeleteBuffers(1, &m_VBO));
+  CheckGLErrors(glDeleteBuffers(1, &m_IBO));
+  CheckGLErrors(glDeleteVertexArrays(1, &m_VAO));
+}
 
 void Chunk::Init()
 {
-  glCreateVertexArrays(1, &m_VAO);
-  glCreateBuffers(1, &m_VBO);
-  glCreateBuffers(1, &m_IBO);
+  CheckGLErrors(glCreateVertexArrays(1, &m_VAO));
+  CheckGLErrors(glCreateBuffers(1, &m_VBO));
+  CheckGLErrors(glCreateBuffers(1, &m_IBO));
 }
 
 void Chunk::RegenerateChunk()
 {
-  for(int i = 0; i < CHUNK_VOLUME; i++)
+  // generating the chunk
+  for(int i = 0; i < int(CHUNK_VOLUME); i++)
   {
     m_Blocks[i].ID = BlockID::Grass;
   }
-  for(int i = 0; i < CHUNK_VOLUME; i++)
+
+  // pushing the block vertices into a buffer
+  for(int i = 0; i < int(CHUNK_VOLUME); i++)
   {
 
     Block &block = m_Blocks[i];
@@ -170,40 +180,43 @@ void Chunk::addVertices(int x, int y, int z, int faceIndex, BlockID id)
 
 void Chunk::GenerateMesh()
 {
-  glBindVertexArray(m_VAO);
+  CheckGLErrors(glBindVertexArray(m_VAO));
 
-  glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-  glBufferData(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(float),
-               m_Vertices.data(), GL_STATIC_DRAW);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_Indices.size() * sizeof(uint32_t),
-               m_Indices.data(), GL_STATIC_DRAW);
+  CheckGLErrors(glBindBuffer(GL_ARRAY_BUFFER, m_VBO));
+  CheckGLErrors(glBufferData(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(float),
+                             m_Vertices.data(), GL_STATIC_DRAW));
+  CheckGLErrors(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO));
+  CheckGLErrors(glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                             m_Indices.size() * sizeof(uint32_t),
+                             m_Indices.data(), GL_STATIC_DRAW));
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-                        (void *)(3 * sizeof(float)));
-  glEnableVertexAttribArray(1);
+  CheckGLErrors(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+                                      5 * sizeof(float), (void *)0));
+  CheckGLErrors(glEnableVertexAttribArray(0));
+  CheckGLErrors(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
+                                      5 * sizeof(float),
+                                      (void *)(3 * sizeof(float))));
+  CheckGLErrors(glEnableVertexAttribArray(1));
 
-  glBindVertexArray(0);
+  CheckGLErrors(glBindVertexArray(0));
 }
 
 void Chunk::Draw()
 {
-#ifdef CHK_DEBUG
-  // std::cout << "VAO: " << m_VAO << ", VBO: " << m_VBO << ", IBO: " <<
-  // m_IBO
-  //           << "\n";
-  // std::cout << "Indices size: " << m_Indices.size() << "\n";
-#endif
+  // #ifdef CHK_DEBUG
+  //   std::cout << "VAO: " << m_VAO << ", VBO: " << m_VBO << ", IBO: " << m_IBO
+  //             << "\n";
+  //   std::cout << "Indices size: " << m_Indices.size() << "\n";
+  // #endif
 
-  glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, nullptr);
+  CheckGLErrors(
+      glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, nullptr));
 }
 
 void Chunk::Bind() { glBindVertexArray(m_VAO); }
 void Chunk::Unbind() { glBindVertexArray(0); }
 
-const int Chunk::GetBlockIndexFromPos(const glm::ivec3 &pos) const
+int Chunk::GetBlockIndexFromPos(const glm::ivec3 &pos) const
 {
   // we push blocks into the chunk in this order: x -> z -> y
   // so the above formula is basicly
@@ -212,7 +225,7 @@ const int Chunk::GetBlockIndexFromPos(const glm::ivec3 &pos) const
   return pos.x + CHUNK_SIZE_Z * (pos.z + CHUNK_SIZE_X * pos.y);
 }
 
-const glm::ivec3 Chunk::GetBlockPosFromIndex(int index) const
+glm::ivec3 Chunk::GetBlockPosFromIndex(int index) const
 {
   int y = index / (CHUNK_SIZE_Z * CHUNK_SIZE_X);
   int remainder = index % (CHUNK_SIZE_Z * CHUNK_SIZE_X);
@@ -222,10 +235,10 @@ const glm::ivec3 Chunk::GetBlockPosFromIndex(int index) const
 }
 
 // clang-format off
-const bool Chunk::IsBlockInChunk(const glm::ivec3 &pos) const
+bool Chunk::IsBlockInChunk(const glm::ivec3 &pos) const
 {
-  return pos.x >= 0 && pos.x < CHUNK_SIZE_X &&
-         pos.y >= 0 && pos.y < CHUNK_SIZE_Y &&
-         pos.z >= 0 && pos.z < CHUNK_SIZE_Z;
+  return pos.x >= 0 && pos.x < int(CHUNK_SIZE_X) &&
+         pos.y >= 0 && pos.y < int(CHUNK_SIZE_Y) &&
+         pos.z >= 0 && pos.z < int(CHUNK_SIZE_Z);
 }
 // clang-format on

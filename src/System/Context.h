@@ -11,7 +11,7 @@ public:
   ~Context();
 
   void Init(Window &window);
-  void *GetRaw() const;
+  void *GetRaw() const { return m_Context; }
 
 private:
   void *m_Context;
