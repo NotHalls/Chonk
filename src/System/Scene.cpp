@@ -1,4 +1,5 @@
 #include "Debug/Assert.h"
+#include "Processes/WorldGenerator.h"
 #include "Scene.h"
 #include "System/App.h"
 
@@ -12,15 +13,9 @@
 std::unique_ptr<Camera> Scene::m_Camera = nullptr;
 std::unique_ptr<Shader> Scene::m_Shader = nullptr;
 std::unique_ptr<Texture> Scene::m_TextureAtlas = nullptr;
-std::vector<std::shared_ptr<Chunk>> Scene::m_Chunks;
 
 void Scene::Init(float fov, float nPlane, float fPlane, int width, int height)
 {
-  glEnable(GL_DEPTH_TEST);
-  glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK);
-  glFrontFace(GL_CCW);
-
   m_Camera = std::make_unique<Camera>(fov, nPlane, fPlane, width, height);
   std::unordered_map<std::string, ShaderType> shaders = {
       {"assets/shaders/Default.vert.glsl", ShaderType::Vertex},
@@ -29,17 +24,7 @@ void Scene::Init(float fov, float nPlane, float fPlane, int width, int height)
   m_TextureAtlas =
       std::make_unique<Texture>("assets/textures/TextureAtlas.png");
 
-  /// @temp: pushing chunks into the vector is what the random generator
-  /// should do later on
-  for(int i = 0; i < 16 * 10; i += 16)
-  {
-    for(int j = 0; j < 16 * 10; j += 16)
-    {
-      std::shared_ptr<Chunk> chunk = std::make_shared<Chunk>();
-      chunk->SetPosition(glm::vec3(float(i), 0.0f, float(j)));
-      Scene::PushChunk(chunk);
-    }
-  }
+  World::GenerateWorld();
 }
 
 void Scene::StartScene()
@@ -54,7 +39,7 @@ void Scene::StartScene()
 void Scene::StopScene()
 {
   // CHK_ASSERT(!m_Chunks.empty(), "No Chunks To Render!");
-  for(auto &chunk : m_Chunks)
+  for(auto &chunk : World::GetChunks())
   {
     glm::mat4 model = glm::translate(glm::mat4(1.0f), chunk->GetPosition());
     glm::mat4 mvp = m_Camera->GetVPMatrix() * model;
@@ -62,9 +47,4 @@ void Scene::StopScene()
     chunk->Bind();
     chunk->Draw();
   }
-}
-
-void Scene::PushChunk(const std::shared_ptr<Chunk> &chunk)
-{
-  m_Chunks.push_back(chunk);
 }
