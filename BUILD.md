@@ -6,6 +6,7 @@
 3. Clang (Recomended) or MSVC
 4. Ninja (Not Required For MSVC)
 5. OpenGL 4.6
+6. C++ 23
 
 ## Cloning The Repository:
 1. Open Your Terminal
