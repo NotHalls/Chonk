@@ -35,6 +35,8 @@ void World::GenerateWorld()
   }
 }
 
+void World::ReGenerateWorld() {}
+
 const std::shared_ptr<Chunk> &World::GetChunkAtPos(const glm::ivec3 &pos)
 {
   auto itr = m_Chunks.find(pos);

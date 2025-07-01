@@ -14,6 +14,7 @@ class World
 {
 public:
   static void GenerateWorld();
+  static void ReGenerateWorld();
 
   static const std::unordered_map<glm::ivec3, std::shared_ptr<Chunk>,
                                   Util::IVec3Hasher> &

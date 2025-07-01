@@ -25,6 +25,7 @@ private:
   void Init();
   void OnEvent(const SDL_Event &event);
   void Update(float dt);
+  void OnGuiUpdate(float dt);
   void OnResize(int width, int height);
 
 private:

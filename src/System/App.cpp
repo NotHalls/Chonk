@@ -1,6 +1,7 @@
 #include "App.h"
 #include "Renderer/GladFunctions.h"
 #include "System/Scene.h"
+#include "System/Settings.h"
 
 #include <SDL3/SDL.h>
 #include <glad/glad.h>
@@ -8,27 +9,15 @@
 
 #include <chrono>
 #include <iostream>
+#include <print>
 #include <string>
 
 // file variables
 static float avgFps = 0.0f;
 static float avgFrameTime = 0.0f;
 static float avgFrequency = 0.02f;
-static bool wireframeMode = false;
 
 // file functions
-static void DisplaySettingsGUI()
-{
-  ToggleWireframeMode(wireframeMode);
-  ImGui::Begin("Settings");
-  if(ImGui::Button("Toggle Wireframe"))
-  {
-    wireframeMode = !wireframeMode;
-    ToggleWireframeMode(wireframeMode);
-  }
-  ImGui::End();
-}
-
 static inline void DisplayStatsGUI(float dt)
 {
 #ifdef CHK_DEBUG
@@ -106,8 +95,7 @@ void App::Update(float dt)
   Scene::StartScene();
   Scene::StopScene();
 
-  DisplayStatsGUI(dt);
-  DisplaySettingsGUI();
+  OnGuiUpdate(dt);
 
   GUI::End();
   m_Window->Update();
@@ -138,4 +126,23 @@ void App::OnEvent(const SDL_Event &event)
   }
   m_Gui.OnEvent(event);
   Scene::GetCamera()->OnEvent(event);
+}
+
+void App::OnGuiUpdate(float dt)
+{
+  if(ImGui::BeginMainMenuBar())
+  {
+    if(ImGui::BeginMenu("Game"))
+    {
+      if(ImGui::MenuItem("Settings"))
+      {
+        Settings::Visible = !Settings::Visible;
+      }
+      ImGui::EndMenu();
+    }
+    ImGui::EndMainMenuBar();
+  }
+
+  DisplayStatsGUI(dt);
+  Settings::UpdateGUI();
 }
