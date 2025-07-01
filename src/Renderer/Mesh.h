@@ -22,7 +22,8 @@ public:
   void Bind();
   void Unbind();
 
-  glm::vec3 &GetPosition() { return m_Position; }
+  const glm::vec3 &GetPosition() const { return m_Position; }
+  void SetPosition(const glm::vec3 &pos) { m_Position = pos; }
   TextureID &GetTextureID() { return m_TextureID; }
 
 private:

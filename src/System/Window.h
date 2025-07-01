@@ -11,7 +11,7 @@ public:
   ~Window();
 
   void Resize(int width, int height);
-  void ToggleCursorLock(bool mode);
+  void ToggleCursor(bool mode);
 
   void Update();
 

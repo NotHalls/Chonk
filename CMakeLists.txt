@@ -78,13 +78,13 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
     target_compile_options(${PROJECT_NAME} PRIVATE
-        $<$<CONFIG:Debug>:-Wall -Wextra -Wpedantic -Wno-unused-parameter>
-        $<$<CONFIG:Release>:-Wall -Wextra -Wpedantic -Wno-unused-parameter>
+        $<$<CONFIG:Debug>: -g -O0 -Wall -Wextra -Wpedantic -Wno-unused-parameter>
+        $<$<CONFIG:Release>: -O2 -Wall -Wextra -Wpedantic -Wno-unused-parameter>
     )
 elseif(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE
-        $<$<CONFIG:Debug>:/W4>
-        $<$<CONFIG:Release>:/W4>
+        $<$<CONFIG:Debug>: /Zi /Od /W4>
+        $<$<CONFIG:Release>: /O2 /W4>
     )
 endif()
 
@@ -98,6 +98,3 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E
     "${CMAKE_SOURCE_DIR}/assets"
     "${CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CONFIG_UPPER}}/assets"
 )
-
-# target_compile_options(${PROJECT_NAME} PRIVATE -fsanitize=address -g)
-# target_link_options(${PROJECT_NAME} PRIVATE -fsanitize=address)

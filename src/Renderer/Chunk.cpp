@@ -1,5 +1,6 @@
 #include "Chunk.h"
 #include "Debug/GLError.h"
+#include "Processes/WorldGenerator.h"
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -17,7 +18,7 @@ struct BaseFaceTemplate
 // clang-format off
 // this is a set of values that tell us what side to add or sub according to
 // the index. (used for greedy meshing)
-constexpr const glm::ivec3 BlockFaceIndex[6] = {
+constexpr const glm::ivec3 NextBlockFromFaceIndex[6] = {
   { 0,  0, -1},  // Front
   { 0,  0,  1},  // Back
   {-1,  0,  0},  // Left
@@ -96,10 +97,11 @@ constexpr const glm::vec2 CalculateTextureUVs(int texID, const glm::vec2 &uvs)
   return glm::vec2(tileOffset + uvs * tileScale);
 }
 
-Chunk::Chunk() : m_Position(0.0f, 0.0f, 0.0f)
+Chunk::Chunk(const glm::ivec3 &pos) : m_Position(pos)
 {
+  m_Blocks.resize(CHUNK_VOLUME);
+  GenerateChunkBlocks();
   Init();
-  RegenerateChunk();
 }
 Chunk::~Chunk()
 {
@@ -115,19 +117,21 @@ void Chunk::Init()
   CheckGLErrors(glCreateBuffers(1, &m_IBO));
 }
 
-void Chunk::RegenerateChunk()
+void Chunk::GenerateChunkBlocks()
 {
-  // generating the chunk
   for(int i = 0; i < int(CHUNK_VOLUME); i++)
   {
     m_Blocks[i].ID = BlockID::Grass;
   }
+}
 
+void Chunk::GenerateChunkFaces()
+{
   // pushing the block vertices into a buffer
   for(int i = 0; i < int(CHUNK_VOLUME); i++)
   {
-
     Block &block = m_Blocks[i];
+    glm::ivec3 pos = GetBlockPosFromIndex(i);
     for(int faceIndex = 0; faceIndex < 6; faceIndex++)
     {
       // the faceIndex's index being:
@@ -137,23 +141,34 @@ void Chunk::RegenerateChunk()
       // 3 - Right
       // 4 - Top
       // 5 - Bottom
-      glm::ivec3 pos = GetBlockPosFromIndex(i);
-      glm::ivec3 checkPos = pos + BlockFaceIndex[faceIndex];
-      if(!IsBlockInChunk(checkPos))
+
+      glm::ivec3 checkPos = pos + NextBlockFromFaceIndex[faceIndex];
+      if(IsBlockOuterChunk(checkPos))
       {
-        // check for neighbouring chunk
+        glm::ivec3 outerBlockWorldPos = checkPos + glm::ivec3(m_Position);
+
+        glm::ivec3 outerChunkPos = {
+            (outerBlockWorldPos.x / CHUNK_SIZE_X) * CHUNK_SIZE_X,
+            (outerBlockWorldPos.y / CHUNK_SIZE_Y) * CHUNK_SIZE_Y,
+            (outerBlockWorldPos.z / CHUNK_SIZE_Z) * CHUNK_SIZE_Z,
+        };
+
+        if(World::CheckChunkAtPos(outerChunkPos) &&
+           World::GetChunkBlockAtPos(outerChunkPos, outerBlockWorldPos).ID !=
+               BlockID::None)
+          continue;
       }
       else if(m_Blocks[GetBlockIndexFromPos(checkPos)].ID != BlockID::None)
         continue;
-      addVertices(pos.x, pos.y, pos.z, faceIndex, block.ID);
+      AddVertices(pos.x, pos.y, pos.z, faceIndex, block.ID);
     }
   }
   GenerateMesh();
 }
 
-void Chunk::addVertices(int x, int y, int z, int faceIndex, BlockID id)
+void Chunk::AddVertices(int x, int y, int z, int faceIndex, BlockID id)
 {
-  glm::vec3 worldPos = m_Position + glm::vec3((float)x, (float)y, (float)z);
+  glm::vec3 worldPos = glm::vec3((float)x, (float)y, (float)z);
   // adding vertices
   for(int v = 0; v < 4; v++)
   {
@@ -222,23 +237,31 @@ int Chunk::GetBlockIndexFromPos(const glm::ivec3 &pos) const
   // so the above formula is basicly
   // x + (CHUNK_SIZE_X * z) + (CHUNK_SIZE_X * CHUNK_SIZE_Z * y)
 
-  return pos.x + CHUNK_SIZE_Z * (pos.z + CHUNK_SIZE_X * pos.y);
+  return pos.x + (pos.z * CHUNK_SIZE_X) + (pos.y * CHUNK_SIZE_X * CHUNK_SIZE_Z);
 }
 
 glm::ivec3 Chunk::GetBlockPosFromIndex(int index) const
 {
   int y = index / (CHUNK_SIZE_Z * CHUNK_SIZE_X);
   int remainder = index % (CHUNK_SIZE_Z * CHUNK_SIZE_X);
+  /// @test try having different values for X and Z
+  /// see if the 2 lines below work then (just curious).
   int z = remainder / CHUNK_SIZE_Z;
   int x = remainder % CHUNK_SIZE_Z;
   return {x, y, z};
 }
 
-// clang-format off
-bool Chunk::IsBlockInChunk(const glm::ivec3 &pos) const
+const Block &Chunk::GetBlockAtPos(const glm::ivec3 &pos)
 {
-  return pos.x >= 0 && pos.x < int(CHUNK_SIZE_X) &&
-         pos.y >= 0 && pos.y < int(CHUNK_SIZE_Y) &&
-         pos.z >= 0 && pos.z < int(CHUNK_SIZE_Z);
+  int index = GetBlockIndexFromPos(pos);
+  return m_Blocks[index];
+}
+
+// clang-format off
+bool Chunk::IsBlockOuterChunk(const glm::ivec3 &pos) const
+{
+  return pos.x < 0 || pos.x >= int(CHUNK_SIZE_X) ||
+         pos.y < 0 || pos.y >= int(CHUNK_SIZE_Y) ||
+         pos.z < 0 || pos.z >= int(CHUNK_SIZE_Z);
 }
 // clang-format on

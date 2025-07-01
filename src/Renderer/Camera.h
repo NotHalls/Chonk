@@ -31,6 +31,7 @@ public:
 
 private:
   void RecalculateMatrix();
+  void GUIUpdate();
 
 public:
 #ifdef CHK_DEBUG
@@ -55,6 +56,6 @@ private:
   // Camera Controller
   float m_Speed = 5.0f;
   float m_Sensitivity = 0.3f;
-  float m_Yaw = 90.0f, m_Pitch = 0.0f;
+  float m_Yaw = -90.0f, m_Pitch = 0.0f;
   bool m_FirstMouse = true;
 };

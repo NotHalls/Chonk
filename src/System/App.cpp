@@ -10,7 +10,6 @@
 #include <string>
 
 // file variables
-static bool lockMouse = false;
 static float avgFps = 0.0f;
 static float avgFrameTime = 0.0f;
 static float avgFrequency = 0.02f;
@@ -68,6 +67,8 @@ void App::Start()
 
   Scene::Init(45.0f, 0.01f, 1000.0f, 1280, 720);
   OnResize(1280, 720);
+
+  m_Window->ToggleCursor(true);
 }
 
 void App::Update(float dt)
@@ -97,19 +98,11 @@ void App::OnEvent(const SDL_Event &event)
   switch(event.type)
   {
   case SDL_EVENT_KEY_DOWN: {
-    if(event.key.scancode == SDL_SCANCODE_F)
-    {
-      lockMouse = !lockMouse;
-      m_Window->ToggleCursorLock(lockMouse);
-    }
-#ifdef CHK_DEBUG
-    else if(event.key.scancode == SDL_SCANCODE_X)
+    if(event.key.scancode == SDL_SCANCODE_ESCAPE)
     {
       Scene::GetCamera()->LockInput = !Scene::GetCamera()->LockInput;
-      m_Window->ToggleCursorLock(!Scene::GetCamera()->LockInput);
-      lockMouse = !(Scene::GetCamera()->LockInput);
+      m_Window->ToggleCursor(!Scene::GetCamera()->LockInput);
     }
-#endif
     break;
   }
   case SDL_EVENT_WINDOW_RESIZED: {

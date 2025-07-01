@@ -1,11 +1,26 @@
 #include "Camera.h"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <imgui.h>
+
+void Camera::GUIUpdate()
+{
+  ImGui::Begin("Camera");
+  ImGui::DragFloat3("Position", glm::value_ptr(m_Position));
+  ImGui::DragFloat("FOV", &m_FOV);
+  ImGui::DragFloat("Near Plane", &m_NearPlane);
+  ImGui::DragFloat("Far Plane", &m_FarPlane);
+  ImGui::DragFloat("Speed", &m_Speed);
+  ImGui::DragFloat("Sensitivity", &m_Sensitivity);
+  ImGui::End();
+  RecalculateMatrix();
+}
 
 Camera::Camera(float fov, float nearP, float farP, uint32_t width,
                uint32_t height)
-    : m_Width(width), m_Height(height), m_Position(0.0f, 0.0f, -5.0f),
-      m_Up(0.0f, 1.0f, 0.0f), m_Forward(0.0f, 0.0f, 1.0f), m_FOV(fov),
+    : m_Width(width), m_Height(height), m_Position(5.0f, 25.0f, 30.0f),
+      m_Up(0.0f, 1.0f, 0.0f), m_Forward(0.0f, 0.0f, -1.0f), m_FOV(fov),
       m_NearPlane(nearP), m_FarPlane(farP)
 {
   OnResize(800, 600);
@@ -66,6 +81,8 @@ void Camera::OnUpdate(float dt)
   if(keyboard[SDL_SCANCODE_Q])
     SetPosition((m_Position -= m_Up * m_Speed * dt));
 #endif
+
+  GUIUpdate();
 }
 void Camera::OnEvent(const SDL_Event &event)
 {

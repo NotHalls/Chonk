@@ -35,7 +35,7 @@ void Window::Resize(int width, int height)
   std::cout << "Resized To: " << width << height << "\n";
 }
 
-void Window::ToggleCursorLock(bool mode)
+void Window::ToggleCursor(bool mode)
 {
   SDL_SetWindowRelativeMouseMode(static_cast<SDL_Window *>(m_Window), mode);
 }
