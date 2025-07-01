@@ -29,19 +29,6 @@ void World::GenerateWorld()
     }
   }
 
-  // std::shared_ptr<Chunk> chunk =
-  //     std::make_shared<Chunk>(glm::vec3(0.0f, 0.0f, 0.0f));
-  // m_Chunks.insert({{0, 0, 0}, chunk});
-  // std::shared_ptr<Chunk> chunk1 =
-  //     std::make_shared<Chunk>(glm::vec3(16.0f, 0.0f, 0.0f));
-  // m_Chunks.insert({{16, 0, 0}, chunk1});
-  // std::shared_ptr<Chunk> chunk2 = std::make_shared<Chunk>();
-  // chunk2->SetPosition(glm::vec3(32.0f, 0.0f, 0.0f));
-  // m_Chunks.insert({{32, 0, 0}, chunk2});
-  // std::shared_ptr<Chunk> chunk3 = std::make_shared<Chunk>();
-  // chunk3->SetPosition(glm::vec3(0.0f, 0.0f, 16.0f));
-  // m_Chunks.insert({{0, 0, 16}, chunk3});
-
   for(auto [pos, chunk] : m_Chunks)
   {
     chunk->GenerateChunkFaces();
