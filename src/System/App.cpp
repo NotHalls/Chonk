@@ -2,10 +2,11 @@
 #include "Renderer/GladFunctions.h"
 #include "System/Scene.h"
 
-#include <SDL3/SDL_events.h>
+#include <SDL3/SDL.h>
 #include <glad/glad.h>
 #include <imgui.h>
 
+#include <chrono>
 #include <iostream>
 #include <string>
 
@@ -53,10 +54,10 @@ static inline void DisplayStatsGUI(float dt)
 App *App::m_App = nullptr;
 
 // class functions
-App::App() { Start(); }
+App::App() { Init(); }
 App::~App() {}
 
-void App::Start()
+void App::Init()
 {
   m_App = this;
   SDL_Init();
@@ -69,6 +70,31 @@ void App::Start()
   OnResize(1280, 720);
 
   m_Window->ToggleCursor(true);
+}
+
+void App::Run()
+{
+  auto startTime = std::chrono::high_resolution_clock::now();
+  SDL_Event event;
+
+  while(m_IsRunning)
+  {
+    auto curtTime = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<float> delta = curtTime - startTime;
+    startTime = curtTime;
+    float dt = delta.count();
+
+    while(SDL_PollEvent(&event))
+    {
+      OnEvent(event);
+      if(event.type == SDL_EVENT_QUIT)
+        m_IsRunning = false;
+    }
+
+    Update(dt);
+  }
+
+  SDL_Quit();
 }
 
 void App::Update(float dt)

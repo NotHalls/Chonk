@@ -1,4 +1,5 @@
 #include "Debug/Assert.h"
+#include "FixedGlobals.h"
 #include "WorldGenerator.h"
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -13,14 +14,14 @@
 #include <print>
 #include <string>
 
-std::unordered_map<glm::ivec3, std::shared_ptr<Chunk>, IVec3Hasher>
+std::unordered_map<glm::ivec3, std::shared_ptr<Chunk>, Util::IVec3Hasher>
     World::m_Chunks;
 
 void World::GenerateWorld()
 {
-  for(int z = 0; z < 16 * 2; z += 16)
+  for(int z = 0; z < Global::CHUNK_SIZE_Z * 20; z += 16)
   {
-    for(int x = 0; x < 16 * 2; x += 16)
+    for(int x = 0; x < Global::CHUNK_SIZE_X * 20; x += 16)
     {
       std::shared_ptr<Chunk> chunk =
           std::make_shared<Chunk>(glm::vec3(float(x), 0.0f, float(z)));
@@ -62,7 +63,9 @@ const Block &World::GetChunkBlockAtPos(const glm::ivec3 &chunkPos,
                                        const glm::ivec3 &blockPos)
 {
   const std::shared_ptr<Chunk> &chunk = GetChunkAtPos(chunkPos);
-  glm::ivec3 checkPos = blockPos % Chunk::GetFixedChunkSize();
+  glm::ivec3 checkPos =
+      blockPos % glm::ivec3(Global::CHUNK_SIZE_X, Global::CHUNK_SIZE_Y,
+                            Global::CHUNK_SIZE_Z);
   return chunk->GetBlockAtPos(checkPos);
 }
 

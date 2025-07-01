@@ -8,79 +8,6 @@
 
 #include <iostream>
 
-struct BaseFaceTemplate
-{
-  glm::vec3 Positions[4];
-  glm::vec2 UVs[4];
-  uint8_t FaceID;
-};
-
-// clang-format off
-// this is a set of values that tell us what side to add or sub according to
-// the index. (used for greedy meshing)
-constexpr const glm::ivec3 NextBlockFromFaceIndex[6] = {
-  { 0,  0, -1},  // Front
-  { 0,  0,  1},  // Back
-  {-1,  0,  0},  // Left
-  { 1,  0,  0},  // Right
-  { 0,  1,  0},  // Top
-  { 0, -1,  0}   // Bottom
-};
-// clang-format on
-
-// this is what we push into vertices for each face index
-constexpr const std::array<BaseFaceTemplate, 6> FaceTemplates = {
-    // Front Face
-    BaseFaceTemplate{{glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f),
-                      glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)},
-                     {glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f),
-                      glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-                     1},
-
-    // Back Face
-    BaseFaceTemplate{{glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f),
-                      glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f)},
-                     {glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f),
-                      glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-                     1},
-    // Left Face
-    BaseFaceTemplate{{glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f),
-                      glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 1.0f)},
-                     {glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f),
-                      glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-                     1},
-    // Right Face
-    BaseFaceTemplate{{glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 1.0f),
-                      glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 0.0f)},
-                     {glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f),
-                      glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-                     1},
-    // Top Face
-    BaseFaceTemplate{{glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 0.0f),
-                      glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f)},
-                     {glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f),
-                      glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-                     0},
-    // Bottom Face
-    BaseFaceTemplate{{glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
-                      glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f)},
-                     {glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f),
-                      glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-                     2}};
-constexpr const glm::vec3 GetBlockTextureFromID(BlockID id)
-{
-  // clang-format off
-  switch(id)
-  {
-    case BlockID::None:   return {0, 0, 0};
-    case BlockID::Grass:  return {1, 2, 3};
-    case BlockID::Moss:   return {1, 1, 1};
-    case BlockID::Dirt:   return {3, 3, 3};
-    case BlockID::Stone:  return {4, 4, 4};
-    default: return {0, 0, 0};
-  };
-  // clang-format on
-}
 // this piece of code gives us the uvs for each vertice.
 constexpr const glm::vec2 CalculateTextureUVs(int texID, const glm::vec2 &uvs)
 {
@@ -99,7 +26,7 @@ constexpr const glm::vec2 CalculateTextureUVs(int texID, const glm::vec2 &uvs)
 
 Chunk::Chunk(const glm::ivec3 &pos) : m_Position(pos)
 {
-  m_Blocks.resize(CHUNK_VOLUME);
+  m_Blocks.resize(Global::CHUNK_VOLUME);
   GenerateChunkBlocks();
   Init();
 }
@@ -119,7 +46,7 @@ void Chunk::Init()
 
 void Chunk::GenerateChunkBlocks()
 {
-  for(int i = 0; i < int(CHUNK_VOLUME); i++)
+  for(int i = 0; i < int(Global::CHUNK_VOLUME); i++)
   {
     m_Blocks[i].ID = BlockID::Grass;
   }
@@ -128,7 +55,7 @@ void Chunk::GenerateChunkBlocks()
 void Chunk::GenerateChunkFaces()
 {
   // pushing the block vertices into a buffer
-  for(int i = 0; i < int(CHUNK_VOLUME); i++)
+  for(int i = 0; i < int(Global::CHUNK_VOLUME); i++)
   {
     Block &block = m_Blocks[i];
     glm::ivec3 pos = GetBlockPosFromIndex(i);
@@ -148,9 +75,18 @@ void Chunk::GenerateChunkFaces()
         glm::ivec3 outerBlockWorldPos = checkPos + glm::ivec3(m_Position);
 
         glm::ivec3 outerChunkPos = {
-            (outerBlockWorldPos.x / CHUNK_SIZE_X) * CHUNK_SIZE_X,
-            (outerBlockWorldPos.y / CHUNK_SIZE_Y) * CHUNK_SIZE_Y,
-            (outerBlockWorldPos.z / CHUNK_SIZE_Z) * CHUNK_SIZE_Z,
+            static_cast<int>(
+                std::floor(static_cast<float>(outerBlockWorldPos.x) /
+                           Global::CHUNK_SIZE_X) *
+                Global::CHUNK_SIZE_X),
+            static_cast<int>(
+                std::floor(static_cast<float>(outerBlockWorldPos.y) /
+                           Global::CHUNK_SIZE_Y) *
+                Global::CHUNK_SIZE_Y),
+            static_cast<int>(
+                std::floor(static_cast<float>(outerBlockWorldPos.z) /
+                           Global::CHUNK_SIZE_Z) *
+                Global::CHUNK_SIZE_Z),
         };
 
         if(World::CheckChunkAtPos(outerChunkPos) &&
@@ -235,19 +171,21 @@ int Chunk::GetBlockIndexFromPos(const glm::ivec3 &pos) const
 {
   // we push blocks into the chunk in this order: x -> z -> y
   // so the above formula is basicly
-  // x + (CHUNK_SIZE_X * z) + (CHUNK_SIZE_X * CHUNK_SIZE_Z * y)
+  // x + (CHUNK_SIZE_X * z) + (CHUNK_SIZE_X *
+  // CHUNK_SIZE_Z * y)
 
-  return pos.x + (pos.z * CHUNK_SIZE_X) + (pos.y * CHUNK_SIZE_X * CHUNK_SIZE_Z);
+  return pos.x + (pos.z * Global::CHUNK_SIZE_X) +
+         (pos.y * Global::CHUNK_SIZE_X * Global::CHUNK_SIZE_Z);
 }
 
 glm::ivec3 Chunk::GetBlockPosFromIndex(int index) const
 {
-  int y = index / (CHUNK_SIZE_Z * CHUNK_SIZE_X);
-  int remainder = index % (CHUNK_SIZE_Z * CHUNK_SIZE_X);
+  int y = index / (Global::CHUNK_SIZE_Z * Global::CHUNK_SIZE_X);
+  int remainder = index % (Global::CHUNK_SIZE_Z * Global::CHUNK_SIZE_X);
   /// @test try having different values for X and Z
   /// see if the 2 lines below work then (just curious).
-  int z = remainder / CHUNK_SIZE_Z;
-  int x = remainder % CHUNK_SIZE_Z;
+  int z = remainder / Global::CHUNK_SIZE_Z;
+  int x = remainder % Global::CHUNK_SIZE_Z;
   return {x, y, z};
 }
 
@@ -260,8 +198,8 @@ const Block &Chunk::GetBlockAtPos(const glm::ivec3 &pos)
 // clang-format off
 bool Chunk::IsBlockOuterChunk(const glm::ivec3 &pos) const
 {
-  return pos.x < 0 || pos.x >= int(CHUNK_SIZE_X) ||
-         pos.y < 0 || pos.y >= int(CHUNK_SIZE_Y) ||
-         pos.z < 0 || pos.z >= int(CHUNK_SIZE_Z);
+  return pos.x < 0 || pos.x >= int(Global::CHUNK_SIZE_X) ||
+         pos.y < 0 || pos.y >= int(Global::CHUNK_SIZE_Y) ||
+         pos.z < 0 || pos.z >= int(Global::CHUNK_SIZE_Z);
 }
 // clang-format on
