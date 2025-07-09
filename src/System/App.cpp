@@ -45,7 +45,7 @@ static inline void DisplayStatsGUI(float dt)
 App *App::m_App = nullptr;
 
 // class functions
-App::App() { Init(); }
+App::App() : m_IsRunning(true) { Init(); }
 App::~App() {}
 
 void App::Init()

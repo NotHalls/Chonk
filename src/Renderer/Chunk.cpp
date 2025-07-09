@@ -11,6 +11,7 @@
 Chunk::Chunk(const glm::ivec3 &pos) : m_Position(pos), Dirty(true)
 {
   m_Blocks.resize(Global::CHUNK_VOLUME);
+  m_CurrentVerticeCount = 0;
   Init();
   GenerateChunkBlocks();
 }

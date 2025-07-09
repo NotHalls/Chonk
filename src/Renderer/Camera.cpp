@@ -26,6 +26,11 @@ Camera::Camera(float fov, float nearP, float farP, uint32_t width,
       m_Up(0.0f, 1.0f, 0.0f), m_Forward(0.0f, 0.0f, -1.0f), m_FOV(fov),
       m_NearPlane(nearP), m_FarPlane(farP)
 {
+  m_Speed = 5.0f;
+  m_Sensitivity = 0.3f;
+  m_Yaw = -90.0f;
+  m_Pitch = 0.0f;
+  m_FirstMouse = true;
   OnResize(800, 600);
 }
 

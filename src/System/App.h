@@ -34,5 +34,5 @@ private:
   std::unique_ptr<Context> m_Context;
   GUI m_Gui;
 
-  bool m_IsRunning = true;
+  bool m_IsRunning;
 };
