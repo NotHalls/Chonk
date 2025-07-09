@@ -97,8 +97,25 @@ constexpr const std::array<BaseFaceTemplate, 6> FaceTemplates = {
                       glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
                      2}};
 
+// this piece of code gives us the uvs for each vertice.
+constexpr const glm::vec2 CalculateBlockTextureUVs(int texID,
+                                                   const glm::vec2 &uvs)
+{
+  const int numRows = 5;
+  const int numCols = 5;
+
+  int col = texID % numCols;
+  int row = texID / numCols;
+
+  glm::vec2 tileOffset =
+      glm::vec2(float(col) / float(numCols), float(row) / float(numRows));
+  glm::vec2 tileScale = glm::vec2(1 / float(numCols), 1 / float(numRows));
+
+  return glm::vec2(tileOffset + uvs * tileScale);
+}
+
 // clang-format off
-constexpr const glm::vec3 GetBlockTextureFromID(BlockID id)
+constexpr const glm::ivec3 GetBlockTextureFromID(BlockID id)
 {
   switch(id)
   {

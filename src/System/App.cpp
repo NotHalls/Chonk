@@ -17,6 +17,8 @@ static float avgFps = 0.0f;
 static float avgFrameTime = 0.0f;
 static float avgFrequency = 0.02f;
 
+static glm::vec3 previousPlayerPosition = {0.0f, 0.0f, 0.0f};
+
 // file functions
 static inline void DisplayStatsGUI(float dt)
 {
@@ -116,6 +118,15 @@ void App::OnEvent(const SDL_Event &event)
     {
       Scene::GetCamera()->LockInput = !Scene::GetCamera()->LockInput;
       m_Window->ToggleCursor(!Scene::GetCamera()->LockInput);
+    }
+    if(event.key.scancode == SDL_SCANCODE_X)
+    {
+      if(!Scene::GetCamera()->Spectating)
+        previousPlayerPosition = Scene::GetCamera()->GetPosition();
+      else
+        Scene::GetCamera()->SetPosition(previousPlayerPosition);
+
+      Scene::GetCamera()->Spectating = !Scene::GetCamera()->Spectating;
     }
     break;
   }

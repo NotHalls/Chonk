@@ -1,4 +1,6 @@
 #include "Camera.h"
+#include "FixedGlobals.h"
+#include "Processes/WorldGenerator.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -7,7 +9,8 @@
 void Camera::GUIUpdate()
 {
   ImGui::Begin("Camera");
-  ImGui::DragFloat3("Position", glm::value_ptr(m_Position));
+  if(ImGui::DragFloat3("Position", glm::value_ptr(m_Position)))
+    SetPosition(m_Position);
   ImGui::DragFloat("FOV", &m_FOV);
   ImGui::DragFloat("Near Plane", &m_NearPlane);
   ImGui::DragFloat("Far Plane", &m_FarPlane);
@@ -19,7 +22,7 @@ void Camera::GUIUpdate()
 
 Camera::Camera(float fov, float nearP, float farP, uint32_t width,
                uint32_t height)
-    : m_Width(width), m_Height(height), m_Position(5.0f, 25.0f, 30.0f),
+    : m_Width(width), m_Height(height), m_Position(8.0f, 25.0f, 8.0f),
       m_Up(0.0f, 1.0f, 0.0f), m_Forward(0.0f, 0.0f, -1.0f), m_FOV(fov),
       m_NearPlane(nearP), m_FarPlane(farP)
 {
@@ -108,6 +111,12 @@ void Camera::SetPosition(const glm::vec3 &pos)
 {
   m_Position = pos;
   RecalculateMatrix();
+
+  if(!Spectating)
+  {
+    World::UnloadUnseenChunks();
+    World::GenerateWorld();
+  }
 }
 void Camera::SetForward(const glm::vec3 &forward)
 {
@@ -128,4 +137,14 @@ void Camera::SetFarPlane(float farP)
 {
   m_FarPlane = farP;
   RecalculateMatrix();
+}
+
+const glm::ivec3 Camera::GetChunkPosition() const
+{
+  return {static_cast<int>(std::floor(m_Position.x / Global::CHUNK_SIZE_X) *
+                           Global::CHUNK_SIZE_X),
+          static_cast<int>(std::floor(m_Position.y / Global::CHUNK_SIZE_Y) *
+                           Global::CHUNK_SIZE_Y),
+          static_cast<int>(std::floor(m_Position.z / Global::CHUNK_SIZE_Z) *
+                           Global::CHUNK_SIZE_Z)};
 }

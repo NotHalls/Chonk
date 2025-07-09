@@ -26,7 +26,6 @@ void Scene::Init(float fov, float nPlane, float fPlane, int width, int height)
   m_Shader = std::make_unique<Shader>(shaders);
   m_TextureAtlas =
       std::make_unique<Texture>("assets/textures/TextureAtlas.png");
-
   World::GenerateWorld();
 }
 

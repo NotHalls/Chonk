@@ -8,27 +8,11 @@
 
 #include <iostream>
 
-// this piece of code gives us the uvs for each vertice.
-constexpr const glm::vec2 CalculateTextureUVs(int texID, const glm::vec2 &uvs)
-{
-  const int numRows = 5;
-  const int numCols = 5;
-
-  int col = texID % numCols;
-  int row = texID / numCols;
-
-  glm::vec2 tileOffset =
-      glm::vec2(float(col) / float(numCols), float(row) / float(numRows));
-  glm::vec2 tileScale = glm::vec2(1 / float(numCols), 1 / float(numRows));
-
-  return glm::vec2(tileOffset + uvs * tileScale);
-}
-
-Chunk::Chunk(const glm::ivec3 &pos) : m_Position(pos)
+Chunk::Chunk(const glm::ivec3 &pos) : m_Position(pos), Dirty(true)
 {
   m_Blocks.resize(Global::CHUNK_VOLUME);
-  GenerateChunkBlocks();
   Init();
+  GenerateChunkBlocks();
 }
 Chunk::~Chunk()
 {
@@ -54,11 +38,19 @@ void Chunk::GenerateChunkBlocks()
 
 void Chunk::GenerateChunkFaces()
 {
+  if(!Dirty)
+    return;
+
+  m_Vertices.clear();
+  m_Indices.clear();
+  m_CurrentVerticeCount = 0;
+
   // pushing the block vertices into a buffer
   for(int i = 0; i < int(Global::CHUNK_VOLUME); i++)
   {
     Block &block = m_Blocks[i];
-    glm::ivec3 pos = GetBlockPosFromIndex(i);
+    glm::ivec3 localPos = GetBlockPosFromIndex(i);
+    glm::ivec3 worldPos = m_Position + localPos;
     for(int faceIndex = 0; faceIndex < 6; faceIndex++)
     {
       // the faceIndex's index being:
@@ -69,10 +61,10 @@ void Chunk::GenerateChunkFaces()
       // 4 - Top
       // 5 - Bottom
 
-      glm::ivec3 checkPos = pos + NextBlockFromFaceIndex[faceIndex];
+      glm::ivec3 checkPos = localPos + NextBlockFromFaceIndex[faceIndex];
       if(IsBlockOuterChunk(checkPos))
       {
-        glm::ivec3 outerBlockWorldPos = checkPos + glm::ivec3(m_Position);
+        glm::ivec3 outerBlockWorldPos = checkPos + m_Position;
 
         glm::ivec3 outerChunkPos = {
             static_cast<int>(
@@ -96,10 +88,11 @@ void Chunk::GenerateChunkFaces()
       }
       else if(m_Blocks[GetBlockIndexFromPos(checkPos)].ID != BlockID::None)
         continue;
-      AddVertices(pos.x, pos.y, pos.z, faceIndex, block.ID);
+      AddVertices(localPos.x, localPos.y, localPos.z, faceIndex, block.ID);
     }
   }
   GenerateMesh();
+  Dirty = false;
 }
 
 void Chunk::AddVertices(int x, int y, int z, int faceIndex, BlockID id)
@@ -109,7 +102,7 @@ void Chunk::AddVertices(int x, int y, int z, int faceIndex, BlockID id)
   for(int v = 0; v < 4; v++)
   {
     glm::vec3 pos = FaceTemplates[faceIndex].Positions[v] + worldPos;
-    glm::vec2 verticeUV = CalculateTextureUVs(
+    glm::vec2 verticeUV = CalculateBlockTextureUVs(
         GetBlockTextureFromID(id)[FaceTemplates[faceIndex].FaceID],
         FaceTemplates[faceIndex].UVs[v]);
     m_Vertices.push_back(pos.x);
@@ -184,8 +177,8 @@ glm::ivec3 Chunk::GetBlockPosFromIndex(int index) const
   int remainder = index % (Global::CHUNK_SIZE_Z * Global::CHUNK_SIZE_X);
   /// @test try having different values for X and Z
   /// see if the 2 lines below work then (just curious).
-  int z = remainder / Global::CHUNK_SIZE_Z;
-  int x = remainder % Global::CHUNK_SIZE_Z;
+  int z = remainder / Global::CHUNK_SIZE_X;
+  int x = remainder % Global::CHUNK_SIZE_X;
   return {x, y, z};
 }
 

@@ -10,7 +10,8 @@ public:
   ~Camera() {}
 
   const glm::mat4 &GetVPMatrix() const { return m_ProjectionView; }
-  const glm::vec3 &GetTransform() const { return m_Position; }
+  const glm::vec3 &GetPosition() const { return m_Position; }
+  const glm::ivec3 GetChunkPosition() const;
   float GetFOV() const { return m_FOV; }
   float GetNearPlane() const { return m_NearPlane; }
   float GetFatPlane() const { return m_FarPlane; }
@@ -34,9 +35,8 @@ private:
   void GUIUpdate();
 
 public:
-#ifdef CHK_DEBUG
   bool LockInput = false;
-#endif
+  bool Spectating = false;
 
 private:
   glm::mat4 m_Projection;

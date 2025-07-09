@@ -14,7 +14,19 @@ class World
 {
 public:
   static void GenerateWorld();
-  static void ReGenerateWorld();
+  static void LoadChunk(const glm::ivec3 &pos);
+  /// @brief Unloads a chunk at specified position
+  static void UnloadChunk(const glm::ivec3 &pos);
+  /// @brief Unloads chunks outside the Settings::RenderDistance
+  static void UnloadUnseenChunks();
+  /// @brief Unloads and Loads the chunk at a given position (IF IT EXISTS)
+  static void ReloadChunk(const glm::ivec3 &pos);
+
+  /// @brief Removes all the chunks form the World
+  static void ClearChunks();
+
+  /// @brief Checks if given Chunk has neighbours and updates them
+  static void UpdateChunkNeighbours(const glm::ivec3 &pos);
 
   static const std::unordered_map<glm::ivec3, std::shared_ptr<Chunk>,
                                   Util::IVec3Hasher> &

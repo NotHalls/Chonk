@@ -23,7 +23,7 @@ class Settings
 {
 public:
   static void SetVideoSettings(VideoSettingsOptions option, int value);
-  static int GetVideoSettings(VideoSettingsOptions option);
+  static const int GetVideoSettings(VideoSettingsOptions option);
 
   static void UpdateGUI();
 

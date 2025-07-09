@@ -6,17 +6,17 @@
 
 #include <print>
 
-int Settings::m_RenderDistance = 5;
+int Settings::m_RenderDistance = 1;
 bool Settings::m_VSync = true;
 bool Settings::m_WireframeMode = false;
-bool Settings::Visible = false;
+bool Settings::Visible = true;
 
 void Settings::SetVideoSettings(VideoSettingsOptions option, int value)
 {
   switch(option)
   {
   case VideoSettingsOptions::NoOption: {
-    std::println("Select A Valid Option");
+    std::println("You Didn't Select A Valid Option");
     break;
   }
   case VideoSettingsOptions::RenderDistance: {
@@ -32,13 +32,13 @@ void Settings::SetVideoSettings(VideoSettingsOptions option, int value)
     break;
   }
   default: {
-    std::println("Select A Valid Option");
+    std::println("You Didn't Select A Valid Option");
   }
   };
 }
 
 // clang-format off
-int Settings::GetVideoSettings(VideoSettingsOptions option)
+const int Settings::GetVideoSettings(VideoSettingsOptions option)
 {
   switch(option)
   {
@@ -70,7 +70,8 @@ void Settings::UpdateGUI()
       ImGui::Separator();
       if(ImGui::DragInt("Render Distance", &m_RenderDistance))
       {
-        World::ReGenerateWorld();
+        World::UnloadUnseenChunks();
+        World::GenerateWorld();
       }
       if(ImGui::Checkbox("VSync", &m_VSync))
       {
