@@ -37,7 +37,6 @@ add_subdirectory(./submodules/sdl)
 
 add_library(glad STATIC submodules/glad/src/glad.c)
 target_include_directories(glad PUBLIC submodules/glad/include)
-target_compile_options(glad PUBLIC -w -Wno-language-extension-token)
 
 add_library(imgui STATIC
     submodules/imgui/imconfig.h
