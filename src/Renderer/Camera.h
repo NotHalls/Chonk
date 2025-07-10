@@ -54,8 +54,8 @@ private:
   float m_NearPlane, m_FarPlane;
 
   // Camera Controller
-  float m_Speed = 5.0f;
-  float m_Sensitivity = 0.3f;
-  float m_Yaw = -90.0f, m_Pitch = 0.0f;
-  bool m_FirstMouse = true;
+  float m_Speed;
+  float m_Sensitivity;
+  float m_Yaw, m_Pitch;
+  bool m_FirstMouse;
 };
