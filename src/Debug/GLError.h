@@ -30,5 +30,5 @@ static bool checkGLErrors(const char *function, const char *file, int line)
   return true;
 }
 #elif CHK_RELEASE
-#define CheckGLErrors(x)
+#define CheckGLErrors(x) x;
 #endif

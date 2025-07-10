@@ -37,6 +37,9 @@ static inline void DisplayStatsGUI(float dt)
   ImGui::Begin("Stats");
   avgFps = avgFps * (1.0f - avgFrequency) + (1.0f / dt) * avgFrequency;
   ImGui::Text("AVG FPS: %.0f", avgFps);
+  avgFrameTime =
+      avgFrameTime * (1.0f - avgFrequency) + (dt * 1000.0f) * avgFrequency;
+  ImGui::Text("AVG Frame Time: %.3f", avgFrameTime);
   ImGui::End();
 #endif
 }

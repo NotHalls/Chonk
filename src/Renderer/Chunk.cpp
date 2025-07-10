@@ -7,6 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
+#include <print>
 
 Chunk::Chunk(const glm::ivec3 &pos) : m_Position(pos), Dirty(true)
 {
@@ -121,6 +122,7 @@ void Chunk::AddVertices(int x, int y, int z, int faceIndex, BlockID id)
   m_Indices.push_back(m_CurrentVerticeCount + 0);
   m_Indices.push_back(m_CurrentVerticeCount + 3);
   m_CurrentVerticeCount += 4;
+  // std::println("Vertice At X:{}, Y:{}, Z:{} Added", x, y, z);
 }
 
 void Chunk::GenerateMesh()
@@ -148,11 +150,9 @@ void Chunk::GenerateMesh()
 
 void Chunk::Draw()
 {
-  // #ifdef CHK_DEBUG
-  //   std::cout << "VAO: " << m_VAO << ", VBO: " << m_VBO << ", IBO: " << m_IBO
-  //             << "\n";
-  //   std::cout << "Indices size: " << m_Indices.size() << "\n";
-  // #endif
+  // std::cout << "VAO: " << m_VAO << ", VBO: " << m_VBO << ", IBO: " << m_IBO
+  //           << "\n";
+  // std::cout << "Indices size: " << m_Indices.size() << "\n";
 
   CheckGLErrors(
       glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, nullptr));
