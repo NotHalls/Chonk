@@ -18,7 +18,7 @@ public:
   void Bind();
   void Unbind();
 
-  const glm::vec3 &GetPosition() const { return m_Position; }
+  const glm::ivec3 &GetPosition() const { return m_Position; }
   int GetBlockIndexFromPos(const glm::ivec3 &pos) const;
   glm::ivec3 GetBlockPosFromIndex(int index) const;
   const Block &GetBlockAtPos(const glm::ivec3 &pos);

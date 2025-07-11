@@ -21,7 +21,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose a build type (Debug | Release)" FORCE)
 endif()
 
-foreach(CONFIG Debug Release Exprot)
+foreach(CONFIG Debug Release Export)
     string(TOUPPER ${CONFIG} CONFIG_UPPER)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CONFIG_UPPER}
         "${CMAKE_SOURCE_DIR}/bin/${CMAKE_SYSTEM_NAME}-${CMAKE_BUILD_TYPE}-${CMAKE_CXX_COMPILER_ID}")
@@ -60,7 +60,8 @@ target_include_directories(imgui PUBLIC
     submodules/glad/include
 )
 
-file(GLOB_RECURSE MAIN_SOURCES "./src/*.cpp")
+file(GLOB_RECURSE MAIN_SOURCES "./src/*.h" "./src/*.hpp" "./src/*.c" "./src/*.cpp")
+source_group(TREE "${CMAKE_SOURCE_DIR}/src" PREFIX "src" FILES ${MAIN_SOURCES})
 file(GLOB_RECURSE STB_SOURCES "submodules/stb/*.cpp")
 
 add_executable(${PROJECT_NAME} ${MAIN_SOURCES} ${STB_SOURCES})
@@ -85,6 +86,10 @@ elseif(MSVC)
         $<$<CONFIG:Debug>: /Zi /Od /W4>
         $<$<CONFIG:Release>: /O2 /W4>
     )
+    set_target_properties(Chonk PROPERTIES
+        VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+    )
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Chonk)
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 imgui glad)
