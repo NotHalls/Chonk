@@ -9,7 +9,7 @@
 #include <iostream>
 #include <print>
 
-Chunk::Chunk(const glm::ivec3 &pos) : m_Position(pos), Dirty(true)
+Chunk::Chunk(const glm::ivec3 &pos) : Dirty(true), m_Position(pos)
 {
   m_Blocks.resize(Global::CHUNK_VOLUME);
   m_CurrentVerticeCount = 0;
@@ -52,7 +52,6 @@ void Chunk::GenerateChunkFaces()
   {
     Block &block = m_Blocks[i];
     glm::ivec3 localPos = GetBlockPosFromIndex(i);
-    glm::ivec3 worldPos = m_Position + localPos;
     for(int faceIndex = 0; faceIndex < 6; faceIndex++)
     {
       // the faceIndex's index being:

@@ -1,17 +1,28 @@
-#DIRs
+## DIRs
 .vs/
 .cache/
+CMakeFiles/
+# Build Folders
 bin/
 bin-lib/
 bin-objs/
 build/
 out/
+x64/
+*.dir
+# Other Folders
 test/
 _temp
 
-#Files-Types
+## Files-Types
+# VS Files
 *.sln
 *.vcxproj
 *.user
 *.filters
+# Cmake Files
+cmake_install.*
+CMakeCache.*
+
+# Other FIles
 *.my.todo

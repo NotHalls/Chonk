@@ -38,7 +38,7 @@ void Settings::SetVideoSettings(VideoSettingsOptions option, int value)
 }
 
 // clang-format off
-const int Settings::GetVideoSettings(VideoSettingsOptions option)
+int Settings::GetVideoSettings(VideoSettingsOptions option)
 {
   switch(option)
   {
