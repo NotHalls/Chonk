@@ -63,6 +63,8 @@ void App::Init()
   Scene::Init(45.0f, 0.01f, 1000.0f, 1280, 720);
   OnResize(1280, 720);
 
+  Settings::Init();
+
   m_Window->ToggleCursor(true);
 }
 

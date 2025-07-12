@@ -22,6 +22,8 @@ enum class VideoSettingsToggles : short
 class Settings
 {
 public:
+  static void Init();
+
   static void SetVideoSettings(VideoSettingsOptions option, int value);
   static int GetVideoSettings(VideoSettingsOptions option);
 

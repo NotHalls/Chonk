@@ -7,9 +7,15 @@
 #include <print>
 
 int Settings::m_RenderDistance = 1;
-bool Settings::m_VSync = true;
+bool Settings::m_VSync = false;
 bool Settings::m_WireframeMode = false;
 bool Settings::Visible = true;
+
+void Settings::Init()
+{
+  ToggleVSync(m_VSync);
+  ToggleWireframeMode(m_WireframeMode);
+}
 
 void Settings::SetVideoSettings(VideoSettingsOptions option, int value)
 {
@@ -75,6 +81,7 @@ void Settings::UpdateGUI()
       }
       if(ImGui::Checkbox("VSync", &m_VSync))
       {
+        ToggleVSync(m_VSync);
       }
       ImGui::End();
     }
