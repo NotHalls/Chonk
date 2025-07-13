@@ -2,11 +2,11 @@
 
 ## Dependencies
 1. Git
-2. CMake
+2. CMake 3.27+
 3. Clang (Recomended) or MSVC
 4. Ninja (Not Required For MSVC)
 5. OpenGL 4.6
-6. C++ 23
+6. C++ 23+
 
 ## Cloning The Repository:
 1. Open Your Terminal
@@ -27,15 +27,18 @@ git submodule update --init --recursive
 
 ## Building:
 - Make sure you are in the root folder of the project
-1. Run this command to build from CMake
-### For Clang
+- Depending On Your Choice Change The Presets. <br>
+#### Available Presets Are:
+1. Clang-Debug
+2. Clang-Release
+3. Clang-Export
+1. MSVC-Debug
+2. MSVC-Release
+3. MSVC-Export
+
+The Command To Build The Project:
 ```sh
-cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
-```
-> **NOTE:** If you want the **Debug** build, then you need to change the `-DCMAKE_BUILD_TYPE=Release` to `-DCMAKE_BUILD_TYPE=Debug`.
-### For MSVC
-```sh
-cmake -B build -G "Visual Studio 17 2022"
+cmake --preset <THE-PRESET>
 ```
 
 ## Compiling:
@@ -54,11 +57,10 @@ cmake --build build
 
 ## Building From VSCode
 - When you cloned the repository you should probably get a .vscode with it.
-- In the folder you will have `tasks.json` and `launch.json`.
+- In the folder you will have `tasks.json`.
+> **NOTE:** I use the `CMake Tools` extensions so I don't have a `launch.json`. I recomend you get that extension aswell, it's useful. Well if you don't wanna, making a simple `launch.json` shouldn't be that hard
 
 1. Inside VSCode, you need to press `ctrl + shift + p` or what every your keybind is for vscode's command pallet.
-2. Now search for `Run Tasks`. (The option you are looking for is `Tasks: <TOOLCHAIN> Make Build <BUILD_TYPE>`). Select it.
-3. Now either go to the Debug Menu in vscode and click the run button.
-   - Or press `F5` or whatever you keybind is for running the application. (look for `Debug: Continue` option in your keybindings if you dont know what key that is).
+2. Now search for `Run Tasks`. (The option you are looking for is `Tasks: <TOOLCHAIN> CMake Build <BUILD_TYPE>`). Select it.
 
-> **NOTE:** If you have `CMake Tools` Extension, You need to search for `@ext:ms-vscode.cmake-tools Use C Make Presets` and set the values to `Always` (This Is Just A Recomendation).
+> **NOTE:** In The `CMake Tools` Extension, You need to search for `@ext:ms-vscode.cmake-tools Use C Make Presets` and set the values to `Always` (This Is Just A Recomendation).

@@ -35,9 +35,9 @@
         "cwd": "${workspaceFolder}"
       }
     },
-    // Clang Make All
+    // Clang CMake All
     {
-      "label": "CMake: Clang-Make-All",
+      "label": "CMake: Clang-CMake-All",
       "type": "shell",
       "dependsOrder": "parallel",
       "dependsOn": [
@@ -81,9 +81,9 @@
         "cwd": "${workspaceFolder}"
       }
     },
-    // MSVC Make All
+    // MSVC CMake All
     {
-      "label": "CMake: MSVC-Make-All",
+      "label": "CMake: MSVC-CMake-All",
       "type": "shell",
       "dependsOrder": "parallel",
       "dependsOn": [
@@ -532,7 +532,7 @@
     /// CMake Build All ///
     {
       "label": "CMake Build All",
-      "dependsOrder": "parallel",
+      "dependsOrder": "sequence",
       "dependsOn": [
         "CMake All",
         "Build All",
@@ -544,12 +544,12 @@
     },
 
 
-    /// Clang Make Build All ///
+    /// Clang CMake Build All ///
     {
-      "label": "Clang Make Build All",
+      "label": "Clang CMake Build All",
       "dependsOrder": "sequence",
       "dependsOn": [
-        "CMake: Clang-Make-All",
+        "CMake: Clang-CMake-All",
         "Build: Clang-Build-All",
       ],
       "group": {
@@ -557,12 +557,12 @@
         "isDefault": false
       }
     },
-    /// MSVC Make Build All ///
+    /// MSVC CMake Build All ///
     {
-      "label": "MSVC Make Build All",
+      "label": "MSVC CMake Build All",
       "dependsOrder": "sequence",
       "dependsOn": [
-        "CMake: MSVC-Make-All",
+        "CMake: MSVC-CMake-All",
         "Build: MSVC-Build-All",
       ],
       "group": {
@@ -571,9 +571,9 @@
       }
     },
 
-    /// Clang Make Build Debug ///
+    /// Clang CMake Build Debug ///
     {
-      "label": "Clang Make Build Debug",
+      "label": "Clang CMake Build Debug",
       "dependsOrder": "sequence",
       "dependsOn": [
         "CMake: Clang-Debug",
@@ -584,9 +584,9 @@
         "isDefault": false
       }
     },
-    /// Clang Make Build Release ///
+    /// Clang CMake Build Release ///
     {
-      "label": "Clang Make Build Release",
+      "label": "Clang CMake Build Release",
       "dependsOrder": "sequence",
       "dependsOn": [
         "CMake: Clang-Release",
@@ -597,9 +597,9 @@
         "isDefault": false
       }
     },
-    /// Clang Make Build Export ///
+    /// Clang CMake Build Export ///
     {
-      "label": "Clang Make Build Export",
+      "label": "Clang CMake Build Export",
       "dependsOrder": "sequence",
       "dependsOn": [
         "CMake: Clang-Export",
@@ -610,9 +610,9 @@
         "isDefault": false
       }
     },
-    /// MSVC Make Build Debug ///
+    /// MSVC CMake Build Debug ///
     {
-      "label": "MSVC Make Build Debug",
+      "label": "MSVC CMake Build Debug",
       "dependsOrder": "sequence",
       "dependsOn": [
         "CMake: MSVC-Debug",
@@ -623,9 +623,9 @@
         "isDefault": false
       }
     },
-    /// MSVC Make Build Release ///
+    /// MSVC CMake Build Release ///
     {
-      "label": "MSVC Make Build Release",
+      "label": "MSVC CMake Build Release",
       "dependsOrder": "sequence",
       "dependsOn": [
         "CMake: MSVC-Release",
@@ -636,9 +636,9 @@
         "isDefault": false
       }
     },
-    /// MSVC Make Build Export ///
+    /// MSVC CMake Build Export ///
     {
-      "label": "MSVC Make Build Export",
+      "label": "MSVC CMake Build Export",
       "dependsOrder": "sequence",
       "dependsOn": [
         "CMake: MSVC-Export",

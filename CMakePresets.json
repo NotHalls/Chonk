@@ -67,5 +67,32 @@
         "CMAKE_BUILD_TYPE": "Export"
       }
     }
-  ]
+  ],
+
+  "buildPresets": [
+  {
+    "name": "Clang-Debug",
+    "configurePreset": "Clang-Debug"
+  },
+  {
+    "name": "Clang-Release",
+    "configurePreset": "Clang-Release"
+  },
+  {
+    "name": "Clang-Export",
+    "configurePreset": "Clang-Export"
+  },
+  {
+    "name": "MSVC-Debug",
+    "configurePreset": "MSVC-Debug"
+  },
+  {
+    "name": "MSVC-Release",
+    "configurePreset": "MSVC-Release"
+  },
+  {
+    "name": "MSVC-Export",
+    "configurePreset": "MSVC-Export"
+  }
+]
 }
