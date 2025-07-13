@@ -53,13 +53,12 @@ cmake --build build
 <br>
 
 ## Building From VSCode
-> **NOTE:** You will need to change some things around if you are on Linux
 - When you cloned the repository you should probably get a .vscode with it.
 - In the folder you will have `tasks.json` and `launch.json`.
 
-1. Inside VSCode, you can need to press `ctrl + shift + p` or what every your keybind is for vscode's command pallet.
-2. Now search for `Run Tasks`. (The option you are looking for is `Tasks: Run Tasks`). Select it.
-3. You should get a hord of options. Search for `Clang Make Build (<BUILD_TYPE>)`.
-   - Change the `Clang` to `MSVC` if you want to build with the MSVC compiler.
-4. Now either go to the Debug Menu in vscode and click the run button.
+1. Inside VSCode, you need to press `ctrl + shift + p` or what every your keybind is for vscode's command pallet.
+2. Now search for `Run Tasks`. (The option you are looking for is `Tasks: <TOOLCHAIN> Make Build <BUILD_TYPE>`). Select it.
+3. Now either go to the Debug Menu in vscode and click the run button.
    - Or press `F5` or whatever you keybind is for running the application. (look for `Debug: Continue` option in your keybindings if you dont know what key that is).
+
+> **NOTE:** If you have `CMake Tools` Extension, You need to search for `@ext:ms-vscode.cmake-tools Use C Make Presets` and set the values to `Always` (This Is Just A Recomendation).
