@@ -46,7 +46,11 @@ static inline void DisplayStatsGUI(float dt)
 App *App::m_App = nullptr;
 
 // class functions
-App::App() : m_IsRunning(true) { Init(); }
+App::App() : m_IsRunning(true)
+{
+  m_Processes.push_back(std::make_shared<EngineGUI>());
+  Init();
+}
 App::~App() {}
 
 void App::Init()
@@ -56,7 +60,9 @@ void App::Init()
   m_Window = std::make_unique<Window>(1280, 720);
   m_Context = std::make_unique<Context>(*m_Window);
   GLAD_Init();
-  m_Gui.OnStart();
+
+  for(auto &process : m_Processes)
+    process->OnStart();
 
   Scene::Init(45.0f, 0.01f, 1000.0f, 1280, 720);
   OnResize(1280, 720);
@@ -93,7 +99,7 @@ void App::Run()
 
 void App::Update(float dt)
 {
-  GUI::Begin();
+  m_EngineGui->Begin();
 
   Scene::GetCamera()->OnUpdate(dt);
 
@@ -102,7 +108,7 @@ void App::Update(float dt)
 
   OnGuiUpdate(dt);
 
-  GUI::End();
+  m_EngineGui->End();
   m_Window->Update();
 }
 
@@ -136,7 +142,10 @@ void App::OnEvent(const SDL_Event &event)
     break;
   }
   }
-  m_Gui.OnEvent(event);
+
+  for(auto &process : m_Processes)
+    process->OnEvent(event);
+
   Scene::GetCamera()->OnEvent(event);
 }
 

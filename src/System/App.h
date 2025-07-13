@@ -1,13 +1,16 @@
 #pragma once
 
-#include "GUI/ImGui.h"
+#include "GUI/EngineGUI.h"
 #include "System/Context.h"
 #include "System/Init.h"
+#include "System/Process.h"
 #include "System/Window.h"
+
 
 #include <SDL3/SDL_events.h>
 
 #include <memory>
+#include <vector>
 
 class App
 {
@@ -32,7 +35,9 @@ private:
   static App *m_App;
   std::unique_ptr<Window> m_Window;
   std::unique_ptr<Context> m_Context;
-  GUI m_Gui;
+
+  std::vector<std::shared_ptr<Process>> m_Processes;
+  std::shared_ptr<EngineGUI> m_EngineGui;
 
   bool m_IsRunning;
 };

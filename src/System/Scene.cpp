@@ -1,5 +1,5 @@
 #include "Debug/Assert.h"
-#include "GUI/ImGui.h"
+#include "GUI/EngineGUI.h"
 #include "Processes/WorldGenerator.h"
 #include "Scene.h"
 #include "System/App.h"

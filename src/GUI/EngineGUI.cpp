@@ -1,4 +1,4 @@
-#include "ImGui.h"
+#include "EngineGUI.h"
 #include "System/App.h"
 #include "System/Scene.h"
 
@@ -8,14 +8,14 @@
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_sdl3.h>
 
-GUI::~GUI()
+EngineGUI::~EngineGUI()
 {
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplSDL3_Shutdown();
   ImGui::DestroyContext();
 }
 
-void GUI::OnStart()
+void EngineGUI::OnStart()
 {
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -29,22 +29,22 @@ void GUI::OnStart()
   ImGui_ImplOpenGL3_Init("#version 460");
 }
 
-void GUI::OnUpdate(float dt) {}
+void EngineGUI::OnUpdate(float dt) {}
 
-void GUI::OnEvent(const SDL_Event &event)
+void EngineGUI::OnEvent(const SDL_Event &event)
 {
   ImGui_ImplSDL3_ProcessEvent(&event);
 }
 
 // GUI Functions
-void GUI::Begin()
+void EngineGUI::Begin()
 {
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplSDL3_NewFrame();
   ImGui::NewFrame();
 }
 
-void GUI::End()
+void EngineGUI::End()
 {
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
