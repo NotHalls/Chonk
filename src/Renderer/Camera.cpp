@@ -1,6 +1,7 @@
 #include "Camera.h"
 #include "FixedGlobals.h"
 #include "Processes/WorldGenerator.h"
+#include "System/Settings.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -24,7 +25,7 @@ Camera::Camera(float fov, float nearP, float farP, uint32_t width,
                uint32_t height)
     : m_Width(width), m_Height(height), m_Position(8.0f, 25.0f, 8.0f),
       m_Up(0.0f, 1.0f, 0.0f), m_Forward(0.0f, 0.0f, -1.0f), m_FOV(fov),
-      m_NearPlane(nearP), m_FarPlane(farP)
+      m_NearPlane(nearP), m_FarPlane(farP), m_PreviousPlayerPosition(m_Position)
 {
   m_Speed = 5.0f;
   m_Sensitivity = 0.3f;
@@ -111,13 +112,22 @@ void Camera::OnEvent(const SDL_Event &event)
   }
 }
 
+// Others (but useful)
+void Camera::OnSpectateChange(bool value)
+{
+  if(value == true)
+    m_PreviousPlayerPosition = m_Position;
+  else
+    m_Position = m_PreviousPlayerPosition;
+}
+
 // SetGet ers
 void Camera::SetPosition(const glm::vec3 &pos)
 {
   m_Position = pos;
   RecalculateMatrix();
 
-  if(!Spectating)
+  if(!Settings::GetGameSettings(GameSettingsOptions::Spectating))
   {
     World::UnloadUnseenChunks();
     World::GenerateWorld();
