@@ -72,6 +72,16 @@ void Camera::OnUpdate(float dt)
       SetPosition((m_Position += m_Up * m_Speed * dt));
     if(keyboard[SDL_SCANCODE_Q])
       SetPosition((m_Position -= m_Up * m_Speed * dt));
+    if(keyboard[SDL_SCANCODE_R])
+      SetPosition(
+          (m_Position -=
+           (glm::normalize(glm::cross(glm::cross(m_Forward, m_Up), m_Up)) *
+            m_Speed * dt)));
+    if(keyboard[SDL_SCANCODE_F])
+      SetPosition(
+          (m_Position +=
+           (glm::normalize(glm::cross(glm::cross(m_Forward, m_Up), m_Up)) *
+            m_Speed * dt)));
   }
   GUIUpdate();
 }

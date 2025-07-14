@@ -135,6 +135,13 @@ void App::OnEvent(const SDL_Event &event)
       Settings::SetGameSettings(GameSettingsOptions::Spectating,
                                 (spectating = !spectating));
     }
+    if(event.key.scancode == SDL_SCANCODE_Z)
+    {
+      bool wireframeMode =
+          Settings::GetVideoSettings(VideoSettingsOptions::WireframeMode);
+      Settings::SetVideoSettings(VideoSettingsOptions::WireframeMode,
+                                 (wireframeMode = !wireframeMode));
+    }
     break;
   }
   case SDL_EVENT_WINDOW_RESIZED: {

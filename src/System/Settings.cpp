@@ -33,10 +33,12 @@ void Settings::SetVideoSettings(VideoSettingsOptions option, int value)
   }
   case VideoSettingsOptions::VSync: {
     m_VSync = bool(value);
+    ToggleVSync(value);
     break;
   }
   case VideoSettingsOptions::WireframeMode: {
     m_WireframeMode = bool(value);
+    ToggleWireframeMode(value);
     break;
   }
   default:
