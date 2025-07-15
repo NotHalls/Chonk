@@ -19,6 +19,7 @@ const glm::ivec3 FaceDirection[6] = {
 enum class BlockID : uint8_t
 {
   None = 0,
+  Air,
   Grass,
   Moss,
   Dirt,
@@ -31,12 +32,12 @@ enum class BlockID : uint8_t
 
 struct Block
 {
-  BlockID ID;
+  BlockID ID = BlockID::None;
 
-  uint8_t TopTexID;
-  uint8_t SideTexID;
-  uint8_t BottomTexID;
-};
+  uint8_t TopTexID = 0;
+  uint8_t SideTexID = 0;
+  uint8_t BottomTexID = 0;
+} typedef Block;
 
 // this is a set of values that tell us what side to add or sub according to
 // the index. (used for greedy meshing)
@@ -120,6 +121,7 @@ constexpr const glm::ivec3 GetBlockTextureFromID(BlockID id)
   switch(id)
   {
     case BlockID::None:   return {0, 0, 0};
+    case BlockID::Air:   return {0, 0, 0};
     case BlockID::Grass:  return {1, 2, 3};
     case BlockID::Moss:   return {1, 1, 1};
     case BlockID::Dirt:   return {3, 3, 3};

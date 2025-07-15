@@ -23,7 +23,7 @@ void Camera::GUIUpdate()
 
 Camera::Camera(float fov, float nearP, float farP, uint32_t width,
                uint32_t height)
-    : m_Width(width), m_Height(height), m_Position(8.0f, 25.0f, 8.0f),
+    : m_Width(width), m_Height(height), m_Position(8.0f, 260.0f, 8.0f),
       m_Up(0.0f, 1.0f, 0.0f), m_Forward(0.0f, 0.0f, -1.0f), m_FOV(fov),
       m_NearPlane(nearP), m_FarPlane(farP), m_PreviousPlayerPosition(m_Position)
 {

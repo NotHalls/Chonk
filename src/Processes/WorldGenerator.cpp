@@ -136,9 +136,26 @@ const std::shared_ptr<Chunk> &World::GetChunkAtPos(const glm::ivec3 &pos)
   CHK_ASSERT(false, std::string(msg));
 }
 
-const Block &World::GetChunkBlockAtPos(const glm::ivec3 &chunkPos,
-                                       const glm::ivec3 &blockPos)
+const Block &World::GetChunkBlockAtPos(const glm::ivec3 &blockPos)
 {
+  glm::ivec3 chunkPos = {
+      static_cast<int>(
+          std::floor(static_cast<float>(blockPos.x) / Global::CHUNK_SIZE_X) *
+          Global::CHUNK_SIZE_X),
+      static_cast<int>(
+          std::floor(static_cast<float>(blockPos.y) / Global::CHUNK_SIZE_Y) *
+          Global::CHUNK_SIZE_Y),
+      static_cast<int>(
+          std::floor(static_cast<float>(blockPos.z) / Global::CHUNK_SIZE_Z) *
+          Global::CHUNK_SIZE_Z),
+  };
+
+  if(!CheckChunkAtPos(chunkPos))
+  {
+    static Block noneBlock{};
+    return noneBlock;
+  }
+
   const std::shared_ptr<Chunk> &chunk = GetChunkAtPos(chunkPos);
   glm::ivec3 checkPos = Util::NegetiveModule(
       blockPos, glm::ivec3(Global::CHUNK_SIZE_X, Global::CHUNK_SIZE_Y,
@@ -146,7 +163,7 @@ const Block &World::GetChunkBlockAtPos(const glm::ivec3 &chunkPos,
   return chunk->GetBlockAtPos(checkPos);
 }
 
-bool World::CheckChunkAtPos(const glm::ivec3 &pos)
+inline bool World::CheckChunkAtPos(const glm::ivec3 &pos)
 {
   return m_Chunks.contains(pos);
 }

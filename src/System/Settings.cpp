@@ -7,7 +7,7 @@
 
 #include <print>
 
-int Settings::m_RenderDistance = 1;
+int Settings::m_RenderDistance = 3;
 bool Settings::m_Spectating = false;
 bool Settings::m_VSync = false;
 bool Settings::m_WireframeMode = false;

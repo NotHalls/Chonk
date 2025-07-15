@@ -13,6 +13,7 @@ x64/
 # Other Folders
 test/
 _temp
+IGNORE_*
 
 ## Files-Types
 # VS Files

@@ -35,9 +35,8 @@ public:
     return m_Chunks;
   }
   static const std::shared_ptr<Chunk> &GetChunkAtPos(const glm::ivec3 &pos);
-  static const Block &GetChunkBlockAtPos(const glm::ivec3 &chunkPos,
-                                         const glm::ivec3 &blockPos);
-  static bool CheckChunkAtPos(const glm::ivec3 &pos);
+  static const Block &GetChunkBlockAtPos(const glm::ivec3 &blockPos);
+  static inline bool CheckChunkAtPos(const glm::ivec3 &pos);
 
   static void UpdateGUI();
 
