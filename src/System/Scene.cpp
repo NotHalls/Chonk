@@ -3,6 +3,7 @@
 #include "Processes/WorldGenerator.h"
 #include "Scene.h"
 #include "System/App.h"
+#include "System/Settings.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -12,11 +13,30 @@
 
 #include <print>
 
-// class stuff
+// class variables
 std::unique_ptr<Camera> Scene::m_Camera = nullptr;
 std::unique_ptr<Shader> Scene::m_Shader = nullptr;
 std::unique_ptr<Texture> Scene::m_TextureAtlas = nullptr;
 
+// file variables
+static glm::ivec2 lastCamChunkPos = {0, 0};
+
+// file functions
+static bool ChunkGenerationCheck()
+{
+  glm::ivec2 camChunkPos = {Scene::GetCamera()->GetChunkPosition().x,
+                            Scene::GetCamera()->GetChunkPosition().z};
+
+  if(lastCamChunkPos != camChunkPos)
+  {
+    lastCamChunkPos = camChunkPos;
+    return true;
+  }
+  else
+    return false;
+}
+
+// class functions
 void Scene::Init(float fov, float nPlane, float fPlane, int width, int height)
 {
   m_Camera = std::make_unique<Camera>(fov, nPlane, fPlane, width, height);
@@ -43,6 +63,15 @@ void Scene::StartScene()
 }
 void Scene::StopScene()
 {
+  if(!Settings::GetGameSettings(GameSettingsOptions::Spectating))
+  {
+    if(ChunkGenerationCheck())
+    {
+      World::UnloadUnseenChunks();
+      World::GenerateWorld();
+    }
+  }
+
   for(auto &[pos, chunk] : World::GetChunks())
   {
     glm::mat4 model =

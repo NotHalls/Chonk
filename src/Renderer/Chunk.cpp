@@ -64,6 +64,9 @@ void Chunk::GenerateChunkFaces()
   for(int i = 0; i < int(Global::CHUNK_VOLUME); i++)
   {
     Block &block = m_Blocks[i];
+    if(block.ID == BlockID::Air)
+      continue;
+
     glm::ivec3 localPos = GetBlockPosFromIndex(i);
     for(int faceIndex = 0; faceIndex < 6; faceIndex++)
     {
@@ -85,8 +88,8 @@ void Chunk::GenerateChunkFaces()
         glm::ivec3 outerBlockWorldPos =
             glm::ivec3(checkPos.x, checkPos.y, checkPos.z) + m_Position;
 
-        if(World::GetChunkBlockAtPos(outerBlockWorldPos).ID != BlockID::None &&
-           World::GetChunkBlockAtPos(outerBlockWorldPos).ID != BlockID::Air)
+        const Block &checkBlock = World::GetChunkBlockAtPos(outerBlockWorldPos);
+        if(checkBlock.ID != BlockID::None && checkBlock.ID != BlockID::Air)
           continue;
       }
       else if(m_Blocks[GetBlockIndexFromPos(

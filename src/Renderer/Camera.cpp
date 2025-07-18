@@ -136,12 +136,6 @@ void Camera::SetPosition(const glm::vec3 &pos)
 {
   m_Position = pos;
   RecalculateMatrix();
-
-  if(!Settings::GetGameSettings(GameSettingsOptions::Spectating))
-  {
-    World::UnloadUnseenChunks();
-    World::GenerateWorld();
-  }
 }
 void Camera::SetForward(const glm::vec3 &forward)
 {
