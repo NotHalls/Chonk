@@ -58,6 +58,14 @@ void World::GenerateWorld()
   }
 }
 
+void World::GenerateChunkMeshes()
+{
+  for(auto &[pos, chunk] : m_Chunks)
+  {
+    chunk->GenerateMesh();
+  }
+}
+
 void World::LoadChunk(const glm::ivec3 &pos)
 {
   if(CheckChunkAtPos(pos))

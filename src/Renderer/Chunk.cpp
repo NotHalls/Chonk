@@ -99,7 +99,6 @@ void Chunk::GenerateChunkFaces()
       AddVertices(localPos.x, localPos.y, localPos.z, faceIndex, block.ID);
     }
   }
-  GenerateMesh();
   Dirty = false;
 }
 

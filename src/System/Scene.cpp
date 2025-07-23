@@ -71,6 +71,7 @@ void Scene::StopScene()
       World::GenerateWorld();
     }
   }
+  World::GenerateChunkMeshes();
 
   for(auto &[pos, chunk] : World::GetChunks())
   {

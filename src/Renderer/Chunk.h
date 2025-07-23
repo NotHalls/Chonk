@@ -26,6 +26,7 @@ public:
   void Init();
   /// @brief Generates all the faces inside a chunk
   void GenerateChunkFaces();
+  void GenerateMesh();
   void Draw();
 
   bool IsBlockOuterChunk(const glm::ivec3 &pos) const;
@@ -33,7 +34,6 @@ public:
 private:
   void GenerateChunkBlocks();
   void AddVertices(int x, int y, int z, int faceIndex, BlockID id);
-  void GenerateMesh();
 
 public:
   bool Dirty;

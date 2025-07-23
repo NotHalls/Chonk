@@ -14,6 +14,7 @@ class World
 {
 public:
   static void GenerateWorld();
+  static void GenerateChunkMeshes();
   static void LoadChunk(const glm::ivec3 &pos);
   /// @brief Unloads a chunk at specified position
   static void UnloadChunk(const glm::ivec3 &pos);
