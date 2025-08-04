@@ -8,6 +8,7 @@
 
 #include <functional>
 #include <memory>
+#include <mutex>
 #include <unordered_map>
 
 class World
@@ -45,4 +46,5 @@ private:
   static std::unordered_map<glm::ivec3, std::shared_ptr<Chunk>,
                             Util::IVec3Hasher>
       m_Chunks;
+  static std::mutex m_ChunksMutex;
 };

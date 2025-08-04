@@ -17,6 +17,7 @@
 std::unique_ptr<Camera> Scene::m_Camera = nullptr;
 std::unique_ptr<Shader> Scene::m_Shader = nullptr;
 std::unique_ptr<Texture> Scene::m_TextureAtlas = nullptr;
+ThreadQueue Scene::m_ThreadQueue(8); // Initialize with 4 threads
 
 // file variables
 static glm::ivec2 lastCamChunkPos = {0, 0};
@@ -60,9 +61,7 @@ void Scene::StartScene()
 
   // DisplayGUI();
   World::UpdateGUI();
-}
-void Scene::StopScene()
-{
+
   if(!Settings::GetGameSettings(GameSettingsOptions::Spectating))
   {
     if(ChunkGenerationCheck())
@@ -71,8 +70,29 @@ void Scene::StopScene()
       World::GenerateWorld();
     }
   }
-  World::GenerateChunkMeshes();
 
+  m_ThreadQueue.Clear();
+  for(auto &[pos, chunk] : World::GetChunks())
+  {
+    if(chunk->Dirty)
+    {
+      m_ThreadQueue.Enqueue([chunk]() {
+        chunk->GenerateChunkFaces();
+        chunk->Dirty = false;
+      });
+    }
+  }
+  // m_ThreadQueue.Start();
+  // m_ThreadQueue.WaitForCompletion();
+  // m_ThreadQueue.Stop();
+}
+void Scene::StopScene()
+{
+  // multithreading
+  // m_ThreadQueue.WaitForCompletion();
+  // m_ThreadQueue.Stop();
+
+  World::GenerateChunkMeshes();
   for(auto &[pos, chunk] : World::GetChunks())
   {
     glm::mat4 model =

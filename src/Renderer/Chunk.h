@@ -37,6 +37,7 @@ private:
 
 public:
   bool Dirty;
+  bool GenerationDone = false;
 
 private:
   uint32_t m_VAO;

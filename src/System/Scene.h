@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Processes/ThreadQueue.h"
 #include "Renderer/Camera.h"
 #include "Renderer/Chunk.h"
 #include "Renderer/Shader.h"
@@ -20,6 +21,8 @@ public:
   static void StopScene();
 
 private:
+  static ThreadQueue m_ThreadQueue;
+
   static std::unique_ptr<Camera> m_Camera;
   static std::unique_ptr<Shader> m_Shader;
 

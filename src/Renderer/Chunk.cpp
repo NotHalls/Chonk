@@ -100,6 +100,7 @@ void Chunk::GenerateChunkFaces()
     }
   }
   Dirty = false;
+  GenerationDone = true;
 }
 
 void Chunk::AddVertices(int x, int y, int z, int faceIndex, BlockID id)
