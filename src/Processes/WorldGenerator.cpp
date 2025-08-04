@@ -58,6 +58,8 @@ void World::GenerateChunkMeshes()
 {
   for(auto &[pos, chunk] : m_Chunks)
   {
+    if(!chunk->GenerationDone)
+      continue;
     chunk->GenerateMesh();
   }
 }

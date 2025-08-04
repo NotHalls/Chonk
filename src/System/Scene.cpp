@@ -95,6 +95,8 @@ void Scene::StopScene()
   World::GenerateChunkMeshes();
   for(auto &[pos, chunk] : World::GetChunks())
   {
+    if(!chunk->GenerationDone)
+      continue;
     glm::mat4 model =
         glm::translate(glm::mat4(1.0f), glm::vec3(chunk->GetPosition()));
     glm::mat4 mvp = m_Camera->GetVPMatrix() * model;
