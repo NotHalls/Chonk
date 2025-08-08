@@ -1,15 +1,23 @@
 #include "Processes/WorldGenerator.h"
 #include "Renderer/GladFunctions.h"
+#include "Scene.h"
 #include "Settings.h"
 
 #include <imgui.h>
 
 #include <print>
 
-int Settings::m_RenderDistance = 1;
-bool Settings::m_VSync = true;
+int Settings::m_RenderDistance = 3;
+bool Settings::m_Spectating = false;
+bool Settings::m_VSync = false;
 bool Settings::m_WireframeMode = false;
 bool Settings::Visible = true;
+
+void Settings::Init()
+{
+  ToggleVSync(m_VSync);
+  ToggleWireframeMode(m_WireframeMode);
+}
 
 void Settings::SetVideoSettings(VideoSettingsOptions option, int value)
 {
@@ -25,16 +33,35 @@ void Settings::SetVideoSettings(VideoSettingsOptions option, int value)
   }
   case VideoSettingsOptions::VSync: {
     m_VSync = bool(value);
+    ToggleVSync(value);
     break;
   }
   case VideoSettingsOptions::WireframeMode: {
     m_WireframeMode = bool(value);
+    ToggleWireframeMode(value);
     break;
   }
-  default: {
+  default:
+    std::println("You Didn't Select A Valid Option");
+  };
+}
+
+void Settings::SetGameSettings(GameSettingsOptions option, int value)
+{
+  switch(option)
+  {
+  case GameSettingsOptions::NoOption: {
+    std::println("You Didn't Select A Valid Option");
+    break;
+  }
+  case GameSettingsOptions::Spectating: {
+    m_Spectating = bool(value);
+    Scene::GetCamera()->OnSpectateChange(m_Spectating);
+    break;
+  }
+  default:
     std::println("You Didn't Select A Valid Option");
   }
-  };
 }
 
 // clang-format off
@@ -43,15 +70,27 @@ int Settings::GetVideoSettings(VideoSettingsOptions option)
   switch(option)
   {
   case VideoSettingsOptions::NoOption: {
-    std::println("Select A Valid Option");
+    std::println("You Didn't Select A Valid Option");
     break;
   }
   case VideoSettingsOptions::RenderDistance:  return m_RenderDistance;
   case VideoSettingsOptions::VSync:           return int(m_VSync);
   case VideoSettingsOptions::WireframeMode:   return int(m_WireframeMode);
   default: {
-    std::println("Select A Valid Option");
+    std::println("You Didn't Select A Valid Option");
   }
+  }
+}
+
+int Settings::GetGameSettings(GameSettingsOptions option)
+{
+  switch(option)
+  {
+    case GameSettingsOptions::NoOption: {
+      std::println("You Didn't Select A Valid Option");
+      break;
+    }
+    case GameSettingsOptions::Spectating: return m_Spectating;
   }
 }
 // clang-format on
@@ -62,20 +101,31 @@ void Settings::UpdateGUI()
   {
     if(ImGui::Begin("Settings", &Visible))
     {
-      if(ImGui::Button("Toggle Wireframe"))
+      ImGui::SeparatorText("Game Settings");
+      if(ImGui::Checkbox("Spectate", &m_Spectating))
       {
-        m_WireframeMode = !m_WireframeMode;
-        ToggleWireframeMode(m_WireframeMode);
+        Scene::GetCamera()->OnSpectateChange(m_Spectating);
       }
-      ImGui::Separator();
-      if(ImGui::DragInt("Render Distance", &m_RenderDistance))
+
+      ImGui::Spacing();
+      ImGui::SeparatorText("Video Settings");
+
+      if(ImGui::DragInt("Render Distance", &m_RenderDistance, 1, 2, 32))
       {
         World::UnloadUnseenChunks();
         World::GenerateWorld();
       }
+      ImGui::Spacing();
       if(ImGui::Checkbox("VSync", &m_VSync))
       {
+        ToggleVSync(m_VSync);
       }
+      ImGui::SameLine();
+      if(ImGui::Checkbox("Wireframe", &m_WireframeMode))
+      {
+        ToggleWireframeMode(m_WireframeMode);
+      }
+
       ImGui::End();
     }
   }

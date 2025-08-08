@@ -30,13 +30,15 @@ public:
   void OnUpdate(float dt);
   void OnEvent(const SDL_Event &event);
 
+  // Others (but useful)
+  void OnSpectateChange(bool value);
+
 private:
   void RecalculateMatrix();
   void GUIUpdate();
 
 public:
   bool LockInput = false;
-  bool Spectating = false;
 
 private:
   glm::mat4 m_Projection;
@@ -58,4 +60,7 @@ private:
   float m_Sensitivity;
   float m_Yaw, m_Pitch;
   bool m_FirstMouse;
+
+  // Others (but useful)
+  glm::ivec3 m_PreviousPlayerPosition;
 };

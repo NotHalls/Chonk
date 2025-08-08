@@ -17,8 +17,6 @@ static float avgFps = 0.0f;
 static float avgFrameTime = 0.0f;
 static float avgFrequency = 0.02f;
 
-static glm::vec3 previousPlayerPosition = {0.0f, 0.0f, 0.0f};
-
 // file functions
 static inline void DisplayStatsGUI(float dt)
 {
@@ -48,7 +46,11 @@ static inline void DisplayStatsGUI(float dt)
 App *App::m_App = nullptr;
 
 // class functions
-App::App() : m_IsRunning(true) { Init(); }
+App::App() : m_IsRunning(true)
+{
+  m_Processes.push_back(std::make_shared<EngineGUI>());
+  Init();
+}
 App::~App() {}
 
 void App::Init()
@@ -58,10 +60,14 @@ void App::Init()
   m_Window = std::make_unique<Window>(1280, 720);
   m_Context = std::make_unique<Context>(*m_Window);
   GLAD_Init();
-  m_Gui.OnStart();
+
+  for(auto &process : m_Processes)
+    process->OnStart();
 
   Scene::Init(45.0f, 0.01f, 1000.0f, 1280, 720);
   OnResize(1280, 720);
+
+  Settings::Init();
 
   m_Window->ToggleCursor(true);
 }
@@ -93,7 +99,7 @@ void App::Run()
 
 void App::Update(float dt)
 {
-  GUI::Begin();
+  m_EngineGui->Begin();
 
   Scene::GetCamera()->OnUpdate(dt);
 
@@ -102,7 +108,7 @@ void App::Update(float dt)
 
   OnGuiUpdate(dt);
 
-  GUI::End();
+  m_EngineGui->End();
   m_Window->Update();
 }
 
@@ -124,12 +130,17 @@ void App::OnEvent(const SDL_Event &event)
     }
     if(event.key.scancode == SDL_SCANCODE_X)
     {
-      if(!Scene::GetCamera()->Spectating)
-        previousPlayerPosition = Scene::GetCamera()->GetPosition();
-      else
-        Scene::GetCamera()->SetPosition(previousPlayerPosition);
-
-      Scene::GetCamera()->Spectating = !Scene::GetCamera()->Spectating;
+      bool spectating =
+          Settings::GetGameSettings(GameSettingsOptions::Spectating);
+      Settings::SetGameSettings(GameSettingsOptions::Spectating,
+                                (spectating = !spectating));
+    }
+    if(event.key.scancode == SDL_SCANCODE_Z)
+    {
+      bool wireframeMode =
+          Settings::GetVideoSettings(VideoSettingsOptions::WireframeMode);
+      Settings::SetVideoSettings(VideoSettingsOptions::WireframeMode,
+                                 (wireframeMode = !wireframeMode));
     }
     break;
   }
@@ -138,7 +149,10 @@ void App::OnEvent(const SDL_Event &event)
     break;
   }
   }
-  m_Gui.OnEvent(event);
+
+  for(auto &process : m_Processes)
+    process->OnEvent(event);
+
   Scene::GetCamera()->OnEvent(event);
 }
 

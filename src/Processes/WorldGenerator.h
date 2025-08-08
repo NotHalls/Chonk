@@ -7,13 +7,18 @@
 #include <glm/vec3.hpp>
 
 #include <functional>
+#include <future>
 #include <memory>
+#include <mutex>
 #include <unordered_map>
 
 class World
 {
 public:
   static void GenerateWorld();
+  /// @brief Updates async functions the help with generating the chunks
+  static void UpdateWorld();
+  static void GenerateChunkMeshes();
   static void LoadChunk(const glm::ivec3 &pos);
   /// @brief Unloads a chunk at specified position
   static void UnloadChunk(const glm::ivec3 &pos);
@@ -35,14 +40,23 @@ public:
     return m_Chunks;
   }
   static const std::shared_ptr<Chunk> &GetChunkAtPos(const glm::ivec3 &pos);
-  static const Block &GetChunkBlockAtPos(const glm::ivec3 &chunkPos,
-                                         const glm::ivec3 &blockPos);
-  static bool CheckChunkAtPos(const glm::ivec3 &pos);
+  static const Block &GetChunkBlockAtPos(const glm::ivec3 &blockPos);
+  static inline bool CheckChunkAtPos(const glm::ivec3 &pos);
 
+  static const std::unordered_map<glm::ivec3, std::future<void>,
+                                  Util::IVec3Hasher> &
+  GetChunkGenFutures()
+  {
+    return m_ChunkGenFutures;
+  }
   static void UpdateGUI();
 
 private:
   static std::unordered_map<glm::ivec3, std::shared_ptr<Chunk>,
                             Util::IVec3Hasher>
       m_Chunks;
+
+  static std::mutex m_ChunksMutex;
+  static std::unordered_map<glm::ivec3, std::future<void>, Util::IVec3Hasher>
+      m_ChunkGenFutures;
 };

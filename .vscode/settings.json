@@ -1,7 +1,14 @@
 {
-  "C_Cpp.default.compileCommands": "${workspaceRoot}/build/Debug_Clang/compile_commands.json",
   "terminal.integrated.defaultProfile.windows": "Git Bash",
   "[markdown]": {
+    "editor.formatOnSave": false,
+    "editor.defaultFormatter": null
+  },
+  "[json]": {
+    "editor.formatOnSave": false,
+    "editor.defaultFormatter": null
+  },
+  "[jsonc]": {
     "editor.formatOnSave": false,
     "editor.defaultFormatter": null
   },
@@ -77,6 +84,12 @@
     "xstring": "cpp",
     "xtr1common": "cpp",
     "xtree": "cpp",
-    "xutility": "cpp"
+    "xutility": "cpp",
+    "condition_variable": "cpp",
+    "deque": "cpp",
+    "resumable": "cpp",
+    "future": "cpp",
+    "mutex": "cpp",
+    "queue": "cpp"
   }
 }

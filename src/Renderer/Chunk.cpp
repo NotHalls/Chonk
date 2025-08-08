@@ -1,6 +1,7 @@
 #include "Chunk.h"
 #include "Debug/GLError.h"
 #include "Processes/WorldGenerator.h"
+#include "Structs/Math.h"
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -9,7 +10,14 @@
 #include <iostream>
 #include <print>
 
-Chunk::Chunk(const glm::ivec3 &pos) : Dirty(true), m_Position(pos)
+// file variables
+constexpr int VERTICES_PER_FACE = 4;
+constexpr int INDICES_PER_FACE = 6;
+constexpr int ATTRIBS_PER_VERTICE = 5; // 3 Pos; 2 UV
+
+// class functions
+Chunk::Chunk(const glm::ivec3 &pos)
+    : Dirty(true), Generated(false), m_Position(pos), m_CurrentVerticeCount(0)
 {
   m_Blocks.resize(Global::CHUNK_VOLUME);
   m_CurrentVerticeCount = 0;
@@ -36,6 +44,7 @@ void Chunk::GenerateChunkBlocks()
   {
     m_Blocks[i].ID = BlockID::Grass;
   }
+  Generated = true;
 }
 
 void Chunk::GenerateChunkFaces()
@@ -43,14 +52,26 @@ void Chunk::GenerateChunkFaces()
   if(!Dirty)
     return;
 
-  m_Vertices.clear();
-  m_Indices.clear();
-  m_CurrentVerticeCount = 0;
+  int maxFaces = (Global::CHUNK_VOLUME / 2) * 3;
+  int maxVertices = maxFaces * VERTICES_PER_FACE;
+  int maxIndices = maxFaces * INDICES_PER_FACE;
+
+  {
+    std::lock_guard<std::mutex> lock(m_BufferMutex);
+    m_Vertices.clear();
+    m_Indices.clear();
+    m_Vertices.reserve(maxVertices * ATTRIBS_PER_VERTICE);
+    m_Indices.reserve(maxIndices);
+    m_CurrentVerticeCount = 0;
+  }
 
   // pushing the block vertices into a buffer
   for(int i = 0; i < int(Global::CHUNK_VOLUME); i++)
   {
     Block &block = m_Blocks[i];
+    if(block.ID == BlockID::Air)
+      continue;
+
     glm::ivec3 localPos = GetBlockPosFromIndex(i);
     for(int faceIndex = 0; faceIndex < 6; faceIndex++)
     {
@@ -62,42 +83,33 @@ void Chunk::GenerateChunkFaces()
       // 4 - Top
       // 5 - Bottom
 
-      glm::ivec3 checkPos = localPos + NextBlockFromFaceIndex[faceIndex];
-      if(IsBlockOuterChunk(checkPos))
+      Math::IVec3 checkPos = {
+          localPos.x + NextBlockFromFaceIndex[faceIndex].x,
+          localPos.y + NextBlockFromFaceIndex[faceIndex].y,
+          localPos.z + NextBlockFromFaceIndex[faceIndex].z,
+      };
+      if(IsBlockOuterChunk({checkPos.x, checkPos.y, checkPos.z}))
       {
-        glm::ivec3 outerBlockWorldPos = checkPos + m_Position;
+        glm::ivec3 outerBlockWorldPos =
+            glm::ivec3(checkPos.x, checkPos.y, checkPos.z) + m_Position;
 
-        glm::ivec3 outerChunkPos = {
-            static_cast<int>(
-                std::floor(static_cast<float>(outerBlockWorldPos.x) /
-                           Global::CHUNK_SIZE_X) *
-                Global::CHUNK_SIZE_X),
-            static_cast<int>(
-                std::floor(static_cast<float>(outerBlockWorldPos.y) /
-                           Global::CHUNK_SIZE_Y) *
-                Global::CHUNK_SIZE_Y),
-            static_cast<int>(
-                std::floor(static_cast<float>(outerBlockWorldPos.z) /
-                           Global::CHUNK_SIZE_Z) *
-                Global::CHUNK_SIZE_Z),
-        };
-
-        if(World::CheckChunkAtPos(outerChunkPos) &&
-           World::GetChunkBlockAtPos(outerChunkPos, outerBlockWorldPos).ID !=
-               BlockID::None)
+        const Block &checkBlock = World::GetChunkBlockAtPos(outerBlockWorldPos);
+        if(checkBlock.ID != BlockID::None && checkBlock.ID != BlockID::Air)
           continue;
       }
-      else if(m_Blocks[GetBlockIndexFromPos(checkPos)].ID != BlockID::None)
+      else if(m_Blocks[GetBlockIndexFromPos(
+                           glm::ivec3(checkPos.x, checkPos.y, checkPos.z))]
+                  .ID != BlockID::Air)
         continue;
       AddVertices(localPos.x, localPos.y, localPos.z, faceIndex, block.ID);
     }
   }
-  GenerateMesh();
   Dirty = false;
 }
 
 void Chunk::AddVertices(int x, int y, int z, int faceIndex, BlockID id)
 {
+  std::lock_guard<std::mutex> lock(m_BufferMutex);
   glm::vec3 worldPos = glm::vec3((float)x, (float)y, (float)z);
   // adding vertices
   for(int v = 0; v < 4; v++)

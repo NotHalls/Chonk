@@ -7,6 +7,7 @@
 
 #include <array>
 #include <cstdint>
+#include <mutex>
 #include <vector>
 
 class Chunk
@@ -25,18 +26,19 @@ public:
 
   void Init();
   /// @brief Generates all the faces inside a chunk
+  void GenerateChunkBlocks();
   void GenerateChunkFaces();
+  void GenerateMesh();
   void Draw();
 
   bool IsBlockOuterChunk(const glm::ivec3 &pos) const;
 
 private:
-  void GenerateChunkBlocks();
   void AddVertices(int x, int y, int z, int faceIndex, BlockID id);
-  void GenerateMesh();
 
 public:
   bool Dirty;
+  bool Generated;
 
 private:
   uint32_t m_VAO;
@@ -45,9 +47,11 @@ private:
 
   glm::ivec3 m_Position;
 
-  // std::array<Block, CHUNK_VOLUME> m_Blocks;
   std::vector<Block> m_Blocks;
   std::vector<float> m_Vertices;
   std::vector<uint32_t> m_Indices;
   uint32_t m_CurrentVerticeCount;
+
+  std::mutex m_BlocksMutex;
+  std::mutex m_BufferMutex;
 };

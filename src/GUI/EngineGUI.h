@@ -4,15 +4,15 @@
 
 #include <SDL3/SDL_events.h>
 
-class GUI : public Process
+class EngineGUI : public Process
 {
 public:
-  ~GUI();
+  ~EngineGUI();
 
   virtual void OnStart() override;
   virtual void OnUpdate(float dt) override;
-  static void OnEvent(const SDL_Event &event);
+  virtual void OnEvent(const SDL_Event &event) override;
 
-  static void Begin();
-  static void End();
+  void Begin();
+  void End();
 };

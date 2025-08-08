@@ -1,6 +1,7 @@
 #include "Camera.h"
 #include "FixedGlobals.h"
 #include "Processes/WorldGenerator.h"
+#include "System/Settings.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -22,9 +23,9 @@ void Camera::GUIUpdate()
 
 Camera::Camera(float fov, float nearP, float farP, uint32_t width,
                uint32_t height)
-    : m_Width(width), m_Height(height), m_Position(8.0f, 25.0f, 8.0f),
+    : m_Width(width), m_Height(height), m_Position(8.0f, 130.0f, 8.0f),
       m_Up(0.0f, 1.0f, 0.0f), m_Forward(0.0f, 0.0f, -1.0f), m_FOV(fov),
-      m_NearPlane(nearP), m_FarPlane(farP)
+      m_NearPlane(nearP), m_FarPlane(farP), m_PreviousPlayerPosition(m_Position)
 {
   m_Speed = 5.0f;
   m_Sensitivity = 0.3f;
@@ -71,6 +72,16 @@ void Camera::OnUpdate(float dt)
       SetPosition((m_Position += m_Up * m_Speed * dt));
     if(keyboard[SDL_SCANCODE_Q])
       SetPosition((m_Position -= m_Up * m_Speed * dt));
+    if(keyboard[SDL_SCANCODE_R])
+      SetPosition(
+          (m_Position -=
+           (glm::normalize(glm::cross(glm::cross(m_Forward, m_Up), m_Up)) *
+            m_Speed * dt)));
+    if(keyboard[SDL_SCANCODE_F])
+      SetPosition(
+          (m_Position +=
+           (glm::normalize(glm::cross(glm::cross(m_Forward, m_Up), m_Up)) *
+            m_Speed * dt)));
   }
   GUIUpdate();
 }
@@ -111,17 +122,20 @@ void Camera::OnEvent(const SDL_Event &event)
   }
 }
 
+// Others (but useful)
+void Camera::OnSpectateChange(bool value)
+{
+  if(value == true)
+    m_PreviousPlayerPosition = m_Position;
+  else
+    m_Position = m_PreviousPlayerPosition;
+}
+
 // SetGet ers
 void Camera::SetPosition(const glm::vec3 &pos)
 {
   m_Position = pos;
   RecalculateMatrix();
-
-  if(!Spectating)
-  {
-    World::UnloadUnseenChunks();
-    World::GenerateWorld();
-  }
 }
 void Camera::SetForward(const glm::vec3 &forward)
 {

@@ -33,9 +33,17 @@ static constexpr glm::ivec3 GetChunkNeighbour[4] = {
 };
 // clang-format on
 
+static void GenerateChunkFaceOf(const std::shared_ptr<Chunk> &chunk)
+{
+  chunk->GenerateChunkFaces();
+}
+
 // class variables
 std::unordered_map<glm::ivec3, std::shared_ptr<Chunk>, Util::IVec3Hasher>
     World::m_Chunks;
+std::mutex World::m_ChunksMutex;
+std::unordered_map<glm::ivec3, std::future<void>, Util::IVec3Hasher>
+    World::m_ChunkGenFutures;
 
 void World::GenerateWorld()
 {
@@ -54,29 +62,68 @@ void World::GenerateWorld()
 
   for(auto &[pos, chunk] : m_Chunks)
   {
-    chunk->GenerateChunkFaces();
+    if(chunk->Dirty && !m_ChunkGenFutures.contains(pos))
+      m_ChunkGenFutures[pos] =
+          std::async(std::launch::async, GenerateChunkFaceOf, chunk);
+  }
+}
+
+void World::UpdateWorld()
+{
+  for(auto itr = m_ChunkGenFutures.begin(); itr != m_ChunkGenFutures.end();)
+  {
+    if(itr->second.wait_for(std::chrono::seconds(0)) ==
+       std::future_status::ready)
+    {
+      try
+      {
+        itr->second.get();
+      }
+      catch(const std::exception &e)
+      {
+        std::cout << "Error While Generating Chunk: " << e.what() << std::endl;
+      }
+      itr = m_ChunkGenFutures.erase(itr);
+    }
+    else
+      itr++;
+  }
+}
+
+void World::GenerateChunkMeshes()
+{
+  for(auto &[pos, chunk] : m_Chunks)
+  {
+    if(!chunk->Dirty || World::GetChunkGenFutures().contains(pos))
+      chunk->GenerateMesh();
   }
 }
 
 void World::LoadChunk(const glm::ivec3 &pos)
 {
+  std::lock_guard<std::mutex> lock(m_ChunksMutex);
   if(CheckChunkAtPos(pos))
     return;
   std::shared_ptr<Chunk> chunk = std::make_shared<Chunk>(
       glm::vec3(float(pos.x), float(pos.y), float(pos.z)));
-  m_Chunks.insert({{pos.x, pos.y, pos.z}, chunk});
 
+  if(chunk->Dirty || m_ChunkGenFutures.contains(pos))
+  {
+    m_ChunkGenFutures.erase(pos);
+  }
+
+  m_Chunks.insert({{pos.x, pos.y, pos.z}, chunk});
   UpdateChunkNeighbours(pos);
 }
 
 void World::UnloadChunk(const glm::ivec3 &pos)
 {
+  std::lock_guard<std::mutex> lock(m_ChunksMutex);
   CHK_ASSERT(CheckChunkAtPos(pos),
              "No Chunk Exists At Position: " +
                  std::format("X: {}, Y: {}, Z: {}", pos.x, pos.y, pos.z));
 
   m_Chunks.erase(pos);
-
   UpdateChunkNeighbours(pos);
 }
 
@@ -84,26 +131,32 @@ void World::ReloadChunk(const glm::ivec3 &pos)
 {
   UnloadChunk(pos);
   LoadChunk(pos);
+
+  std::lock_guard<std::mutex> lock(m_ChunksMutex);
   m_Chunks.at(pos)->GenerateChunkFaces();
   UpdateChunkNeighbours(pos);
 }
 
 void World::UnloadUnseenChunks()
 {
-  int renderDistance =
-      Settings::GetVideoSettings(VideoSettingsOptions::RenderDistance);
-  glm::ivec3 playerChunkPos = Scene::GetCamera()->GetChunkPosition();
-
   std::vector<glm::ivec3> chunksToUnload;
-
-  for(const auto &[pos, chunk] : m_Chunks)
   {
-    glm::ivec3 checkPos = glm::abs(pos - playerChunkPos);
+    std::lock_guard<std::mutex> lock(m_ChunksMutex);
+    int renderDistance =
+        Settings::GetVideoSettings(VideoSettingsOptions::RenderDistance);
+    glm::ivec3 playerChunkPos = Scene::GetCamera()->GetChunkPosition();
 
-    if(checkPos.x > renderDistance * Global::CHUNK_SIZE_X ||
-       checkPos.z > renderDistance * Global::CHUNK_SIZE_Z)
+    for(const auto &[pos, chunk] : m_Chunks)
     {
-      chunksToUnload.push_back(pos);
+      glm::ivec3 checkPos = glm::abs(pos - playerChunkPos);
+
+      if(checkPos.x > renderDistance * Global::CHUNK_SIZE_X ||
+         checkPos.z > renderDistance * Global::CHUNK_SIZE_Z)
+      {
+        if(chunk->Dirty || m_ChunkGenFutures.contains(pos))
+          continue;
+        chunksToUnload.push_back(pos);
+      }
     }
   }
 
@@ -136,9 +189,27 @@ const std::shared_ptr<Chunk> &World::GetChunkAtPos(const glm::ivec3 &pos)
   CHK_ASSERT(false, std::string(msg));
 }
 
-const Block &World::GetChunkBlockAtPos(const glm::ivec3 &chunkPos,
-                                       const glm::ivec3 &blockPos)
+const Block &World::GetChunkBlockAtPos(const glm::ivec3 &blockPos)
 {
+  std::lock_guard<std::mutex> lock(m_ChunksMutex);
+  glm::ivec3 chunkPos = {
+      static_cast<int>(
+          std::floor(static_cast<float>(blockPos.x) / Global::CHUNK_SIZE_X) *
+          Global::CHUNK_SIZE_X),
+      static_cast<int>(
+          std::floor(static_cast<float>(blockPos.y) / Global::CHUNK_SIZE_Y) *
+          Global::CHUNK_SIZE_Y),
+      static_cast<int>(
+          std::floor(static_cast<float>(blockPos.z) / Global::CHUNK_SIZE_Z) *
+          Global::CHUNK_SIZE_Z),
+  };
+
+  if(!CheckChunkAtPos(chunkPos))
+  {
+    static Block noneBlock{};
+    return noneBlock;
+  }
+
   const std::shared_ptr<Chunk> &chunk = GetChunkAtPos(chunkPos);
   glm::ivec3 checkPos = Util::NegetiveModule(
       blockPos, glm::ivec3(Global::CHUNK_SIZE_X, Global::CHUNK_SIZE_Y,
@@ -146,7 +217,7 @@ const Block &World::GetChunkBlockAtPos(const glm::ivec3 &chunkPos,
   return chunk->GetBlockAtPos(checkPos);
 }
 
-bool World::CheckChunkAtPos(const glm::ivec3 &pos)
+inline bool World::CheckChunkAtPos(const glm::ivec3 &pos)
 {
   return m_Chunks.contains(pos);
 }
