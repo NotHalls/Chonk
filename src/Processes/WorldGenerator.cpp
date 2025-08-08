@@ -33,7 +33,7 @@ static constexpr glm::ivec3 GetChunkNeighbour[4] = {
 };
 // clang-format on
 
-static void GenerateChunkFaceOf(const std::shared_ptr<Chunk> chunk)
+static void GenerateChunkFaceOf(const std::shared_ptr<Chunk> &chunk)
 {
   chunk->GenerateChunkFaces();
 }
@@ -44,7 +44,6 @@ std::unordered_map<glm::ivec3, std::shared_ptr<Chunk>, Util::IVec3Hasher>
 std::mutex World::m_ChunksMutex;
 std::unordered_map<glm::ivec3, std::future<void>, Util::IVec3Hasher>
     World::m_ChunkGenFutures;
-std::vector<std::future<void>> World::m_ChunkLoadFutures;
 
 void World::GenerateWorld()
 {
@@ -107,6 +106,11 @@ void World::LoadChunk(const glm::ivec3 &pos)
     return;
   std::shared_ptr<Chunk> chunk = std::make_shared<Chunk>(
       glm::vec3(float(pos.x), float(pos.y), float(pos.z)));
+
+  if(chunk->Dirty || m_ChunkGenFutures.contains(pos))
+  {
+    m_ChunkGenFutures.erase(pos);
+  }
 
   m_Chunks.insert({{pos.x, pos.y, pos.z}, chunk});
   UpdateChunkNeighbours(pos);

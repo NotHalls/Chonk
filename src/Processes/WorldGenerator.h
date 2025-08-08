@@ -59,5 +59,4 @@ private:
   static std::mutex m_ChunksMutex;
   static std::unordered_map<glm::ivec3, std::future<void>, Util::IVec3Hasher>
       m_ChunkGenFutures;
-  static std::vector<std::future<void>> m_ChunkLoadFutures;
 };

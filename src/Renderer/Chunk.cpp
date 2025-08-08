@@ -17,7 +17,7 @@ constexpr int ATTRIBS_PER_VERTICE = 5; // 3 Pos; 2 UV
 
 // class functions
 Chunk::Chunk(const glm::ivec3 &pos)
-    : Dirty(true), m_Position(pos), m_CurrentVerticeCount(0)
+    : Dirty(true), Generated(false), m_Position(pos), m_CurrentVerticeCount(0)
 {
   m_Blocks.resize(Global::CHUNK_VOLUME);
   Init();
@@ -43,6 +43,7 @@ void Chunk::GenerateChunkBlocks()
   {
     m_Blocks[i].ID = BlockID::Grass;
   }
+  Generated = true;
 }
 
 void Chunk::GenerateChunkFaces()
