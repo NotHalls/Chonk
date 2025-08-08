@@ -22,6 +22,5 @@ public:
 private:
   static std::unique_ptr<Camera> m_Camera;
   static std::unique_ptr<Shader> m_Shader;
-
   static std::unique_ptr<Texture> m_TextureAtlas;
 };

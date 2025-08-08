@@ -33,9 +33,18 @@ static constexpr glm::ivec3 GetChunkNeighbour[4] = {
 };
 // clang-format on
 
+static void GenerateChunkFaceOf(const std::shared_ptr<Chunk> chunk)
+{
+  chunk->GenerateChunkFaces();
+}
+
 // class variables
 std::unordered_map<glm::ivec3, std::shared_ptr<Chunk>, Util::IVec3Hasher>
     World::m_Chunks;
+std::mutex World::m_ChunksMutex;
+std::unordered_map<glm::ivec3, std::future<void>, Util::IVec3Hasher>
+    World::m_ChunkGenFutures;
+std::vector<std::future<void>> World::m_ChunkLoadFutures;
 
 void World::GenerateWorld()
 {
@@ -54,7 +63,31 @@ void World::GenerateWorld()
 
   for(auto &[pos, chunk] : m_Chunks)
   {
-    chunk->GenerateChunkFaces();
+    if(chunk->Dirty && !m_ChunkGenFutures.contains(pos))
+      m_ChunkGenFutures[pos] =
+          std::async(std::launch::async, GenerateChunkFaceOf, chunk);
+  }
+}
+
+void World::UpdateWorld()
+{
+  for(auto itr = m_ChunkGenFutures.begin(); itr != m_ChunkGenFutures.end();)
+  {
+    if(itr->second.wait_for(std::chrono::seconds(0)) ==
+       std::future_status::ready)
+    {
+      try
+      {
+        itr->second.get();
+      }
+      catch(const std::exception &e)
+      {
+        std::cout << "Error While Generating Chunk: " << e.what() << std::endl;
+      }
+      itr = m_ChunkGenFutures.erase(itr);
+    }
+    else
+      itr++;
   }
 }
 
@@ -62,29 +95,31 @@ void World::GenerateChunkMeshes()
 {
   for(auto &[pos, chunk] : m_Chunks)
   {
-    chunk->GenerateMesh();
+    if(!chunk->Dirty || World::GetChunkGenFutures().contains(pos))
+      chunk->GenerateMesh();
   }
 }
 
 void World::LoadChunk(const glm::ivec3 &pos)
 {
+  std::lock_guard<std::mutex> lock(m_ChunksMutex);
   if(CheckChunkAtPos(pos))
     return;
   std::shared_ptr<Chunk> chunk = std::make_shared<Chunk>(
       glm::vec3(float(pos.x), float(pos.y), float(pos.z)));
-  m_Chunks.insert({{pos.x, pos.y, pos.z}, chunk});
 
+  m_Chunks.insert({{pos.x, pos.y, pos.z}, chunk});
   UpdateChunkNeighbours(pos);
 }
 
 void World::UnloadChunk(const glm::ivec3 &pos)
 {
+  std::lock_guard<std::mutex> lock(m_ChunksMutex);
   CHK_ASSERT(CheckChunkAtPos(pos),
              "No Chunk Exists At Position: " +
                  std::format("X: {}, Y: {}, Z: {}", pos.x, pos.y, pos.z));
 
   m_Chunks.erase(pos);
-
   UpdateChunkNeighbours(pos);
 }
 
@@ -92,26 +127,32 @@ void World::ReloadChunk(const glm::ivec3 &pos)
 {
   UnloadChunk(pos);
   LoadChunk(pos);
+
+  std::lock_guard<std::mutex> lock(m_ChunksMutex);
   m_Chunks.at(pos)->GenerateChunkFaces();
   UpdateChunkNeighbours(pos);
 }
 
 void World::UnloadUnseenChunks()
 {
-  int renderDistance =
-      Settings::GetVideoSettings(VideoSettingsOptions::RenderDistance);
-  glm::ivec3 playerChunkPos = Scene::GetCamera()->GetChunkPosition();
-
   std::vector<glm::ivec3> chunksToUnload;
-
-  for(const auto &[pos, chunk] : m_Chunks)
   {
-    glm::ivec3 checkPos = glm::abs(pos - playerChunkPos);
+    std::lock_guard<std::mutex> lock(m_ChunksMutex);
+    int renderDistance =
+        Settings::GetVideoSettings(VideoSettingsOptions::RenderDistance);
+    glm::ivec3 playerChunkPos = Scene::GetCamera()->GetChunkPosition();
 
-    if(checkPos.x > renderDistance * Global::CHUNK_SIZE_X ||
-       checkPos.z > renderDistance * Global::CHUNK_SIZE_Z)
+    for(const auto &[pos, chunk] : m_Chunks)
     {
-      chunksToUnload.push_back(pos);
+      glm::ivec3 checkPos = glm::abs(pos - playerChunkPos);
+
+      if(checkPos.x > renderDistance * Global::CHUNK_SIZE_X ||
+         checkPos.z > renderDistance * Global::CHUNK_SIZE_Z)
+      {
+        if(chunk->Dirty || m_ChunkGenFutures.contains(pos))
+          continue;
+        chunksToUnload.push_back(pos);
+      }
     }
   }
 
@@ -146,6 +187,7 @@ const std::shared_ptr<Chunk> &World::GetChunkAtPos(const glm::ivec3 &pos)
 
 const Block &World::GetChunkBlockAtPos(const glm::ivec3 &blockPos)
 {
+  std::lock_guard<std::mutex> lock(m_ChunksMutex);
   glm::ivec3 chunkPos = {
       static_cast<int>(
           std::floor(static_cast<float>(blockPos.x) / Global::CHUNK_SIZE_X) *

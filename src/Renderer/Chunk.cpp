@@ -54,11 +54,14 @@ void Chunk::GenerateChunkFaces()
   int maxVertices = maxFaces * VERTICES_PER_FACE;
   int maxIndices = maxFaces * INDICES_PER_FACE;
 
-  m_Vertices.clear();
-  m_Indices.clear();
-  m_Vertices.reserve(maxVertices * ATTRIBS_PER_VERTICE);
-  m_Indices.reserve(maxIndices);
-  m_CurrentVerticeCount = 0;
+  {
+    std::lock_guard<std::mutex> lock(m_BufferMutex);
+    m_Vertices.clear();
+    m_Indices.clear();
+    m_Vertices.reserve(maxVertices * ATTRIBS_PER_VERTICE);
+    m_Indices.reserve(maxIndices);
+    m_CurrentVerticeCount = 0;
+  }
 
   // pushing the block vertices into a buffer
   for(int i = 0; i < int(Global::CHUNK_VOLUME); i++)
@@ -104,6 +107,7 @@ void Chunk::GenerateChunkFaces()
 
 void Chunk::AddVertices(int x, int y, int z, int faceIndex, BlockID id)
 {
+  std::lock_guard<std::mutex> lock(m_BufferMutex);
   glm::vec3 worldPos = glm::vec3((float)x, (float)y, (float)z);
   // adding vertices
   for(int v = 0; v < 4; v++)

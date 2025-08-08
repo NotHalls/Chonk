@@ -7,6 +7,7 @@
 
 #include <array>
 #include <cstdint>
+#include <mutex>
 #include <vector>
 
 class Chunk
@@ -45,9 +46,11 @@ private:
 
   glm::ivec3 m_Position;
 
-  // std::array<Block, CHUNK_VOLUME> m_Blocks;
   std::vector<Block> m_Blocks;
   std::vector<float> m_Vertices;
   std::vector<uint32_t> m_Indices;
   uint32_t m_CurrentVerticeCount;
+
+  std::mutex m_BlocksMutex;
+  std::mutex m_BufferMutex;
 };
