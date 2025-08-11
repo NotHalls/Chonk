@@ -189,6 +189,16 @@ const std::shared_ptr<Chunk> &World::GetChunkAtPos(const glm::ivec3 &pos)
   CHK_ASSERT(false, std::string(msg));
 }
 
+const glm::ivec3 World::GetModdedChunkPos(const glm::ivec3 &pos)
+{
+  return {static_cast<int>(std::floor(pos.x / Global::CHUNK_SIZE_X) *
+                           Global::CHUNK_SIZE_X),
+          static_cast<int>(std::floor(pos.y / Global::CHUNK_SIZE_Y) *
+                           Global::CHUNK_SIZE_Y),
+          static_cast<int>(std::floor(pos.z / Global::CHUNK_SIZE_Z) *
+                           Global::CHUNK_SIZE_Z)};
+}
+
 const Block &World::GetChunkBlockAtPos(const glm::ivec3 &blockPos)
 {
   std::lock_guard<std::mutex> lock(m_ChunksMutex);

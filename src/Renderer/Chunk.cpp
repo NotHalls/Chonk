@@ -1,10 +1,12 @@
 #include "Chunk.h"
 #include "Debug/GLError.h"
+#include "Processes/Noise.h"
 #include "Processes/WorldGenerator.h"
 #include "Structs/Math.h"
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/noise.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
@@ -14,6 +16,33 @@
 constexpr int VERTICES_PER_FACE = 4;
 constexpr int INDICES_PER_FACE = 6;
 constexpr int ATTRIBS_PER_VERTICE = 5; // 3 Pos; 2 UV
+
+// file functions
+static int GetNoiseAt(int x, int z)
+{
+  float total = 0.0f;
+  float amplitude = 1.0f;
+  float frequency = 0.01f;        // base frequency
+  float amplitudeDecay = 0.5f;    // reduces influence per octave
+  float frequencyIncrease = 2.0f; // increases detail per octave
+  float totalAmp = 0.0f;
+  int octaves = 5;
+
+  for(int i = 0; i < octaves; i++)
+  {
+    float nx = x * frequency;
+    float nz = z * frequency;
+    total += Noise::Get().GetNoise(nx, nz) * amplitude;
+
+    totalAmp += amplitude;
+    amplitude *= amplitudeDecay;
+    frequency *= frequencyIncrease;
+  }
+
+  total = (total + 1.0f) / totalAmp;
+
+  return int(total) * int(Global::CHUNK_SIZE_Y);
+}
 
 // class functions
 Chunk::Chunk(const glm::ivec3 &pos)
@@ -41,7 +70,27 @@ void Chunk::GenerateChunkBlocks()
 {
   for(int i = 0; i < int(Global::CHUNK_VOLUME); i++)
   {
-    m_Blocks[i].ID = BlockID::Grass;
+    m_Blocks[i].ID = BlockID::None;
+    glm::ivec3 blockPos = GetBlockPosFromIndex(i);
+    glm::ivec3 worldBlockPos = {
+        blockPos.x + m_Position.x,
+        blockPos.y + m_Position.y,
+        blockPos.z + m_Position.z,
+    };
+
+    float noise = Noise::Get().GetNoise<float>(float(worldBlockPos.x * 0.5f),
+                                               float(worldBlockPos.z * 0.5f));
+    noise = (noise + 1.0f) / 2.0f;
+    int yPoint = int(noise * Global::CHUNK_SIZE_Y);
+
+    if(blockPos.y > yPoint)
+      m_Blocks[i].ID = BlockID::Air;
+    else if(blockPos.y == yPoint)
+      m_Blocks[i].ID = BlockID::Grass;
+    else if(blockPos.y >= yPoint - 5)
+      m_Blocks[i].ID = BlockID::Dirt;
+    else
+      m_Blocks[i].ID = BlockID::Stone;
   }
   Generated = true;
 }

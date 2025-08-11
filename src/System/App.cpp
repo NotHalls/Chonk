@@ -1,4 +1,5 @@
 #include "App.h"
+#include "Processes/Noise.h"
 #include "Renderer/GladFunctions.h"
 #include "System/Scene.h"
 #include "System/Settings.h"
@@ -68,6 +69,7 @@ void App::Init()
   OnResize(1280, 720);
 
   Settings::Init();
+  Noise::Init();
 
   m_Window->ToggleCursor(true);
 }

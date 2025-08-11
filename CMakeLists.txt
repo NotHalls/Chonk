@@ -63,14 +63,16 @@ target_include_directories(imgui PUBLIC
 file(GLOB_RECURSE MAIN_SOURCES "./src/*.h" "./src/*.hpp" "./src/*.c" "./src/*.cpp")
 source_group(TREE "${CMAKE_SOURCE_DIR}/src" PREFIX "src" FILES ${MAIN_SOURCES})
 file(GLOB_RECURSE STB_SOURCES "submodules/stb/*.cpp")
+file(GLOB_RECURSE FLN_SOURCES "submodules/FastNoiseLite/*.cpp") # FLN = FastNoiseLite
 
-add_executable(${PROJECT_NAME} ${MAIN_SOURCES} ${STB_SOURCES})
+add_executable(${PROJECT_NAME} ${MAIN_SOURCES} ${STB_SOURCES} ${FLN_SOURCES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     submodules/glm
     submodules/imgui
     submodules/sdl/include
     submodules/stb
+    submodules/FastNoiseLite
 
     ./src
     ./src/include

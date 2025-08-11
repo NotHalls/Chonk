@@ -40,6 +40,9 @@ public:
     return m_Chunks;
   }
   static const std::shared_ptr<Chunk> &GetChunkAtPos(const glm::ivec3 &pos);
+  /// @brief converts a given position to chunk position.
+  /// @example x: 8; z: 8; returns: chunk pos x: 0; y: 0
+  static const glm::ivec3 GetModdedChunkPos(const glm::ivec3 &pos);
   static const Block &GetChunkBlockAtPos(const glm::ivec3 &blockPos);
   static inline bool CheckChunkAtPos(const glm::ivec3 &pos);
 

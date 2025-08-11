@@ -121,7 +121,7 @@ constexpr const glm::ivec3 GetBlockTextureFromID(BlockID id)
   switch(id)
   {
     case BlockID::None:   return {0, 0, 0};
-    case BlockID::Air:   return {0, 0, 0};
+    case BlockID::Air:    return {0, 0, 0};
     case BlockID::Grass:  return {1, 2, 3};
     case BlockID::Moss:   return {1, 1, 1};
     case BlockID::Dirt:   return {3, 3, 3};
