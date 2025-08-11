@@ -20,6 +20,7 @@ enum class BlockID : uint8_t
 {
   None = 0,
   Air,
+  Water,
   Grass,
   Moss,
   Dirt,
@@ -122,6 +123,7 @@ constexpr const glm::ivec3 GetBlockTextureFromID(BlockID id)
   {
     case BlockID::None:   return {0, 0, 0};
     case BlockID::Air:    return {0, 0, 0};
+    case BlockID::Water:  return {5, 5, 5};
     case BlockID::Grass:  return {1, 2, 3};
     case BlockID::Moss:   return {1, 1, 1};
     case BlockID::Dirt:   return {3, 3, 3};

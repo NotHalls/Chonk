@@ -14,14 +14,30 @@ enum class NoiseType
 };
 // clang-format on
 
+struct NoiseSettings
+{
+  int Seed = 0;
+  int Octaves = 3;
+  float Frequency = 0.3f;
+  float FrequencyMultiplier = 2.0f;
+  float Amplitude = 1.0f;
+  float AmplitudeDecay = 0.5f;
+
+  NoiseType Type = NoiseType::Perlin;
+};
+
 class Noise
 {
 public:
-  static void Init();
+  static FastNoiseLite Get();
+
   static void SetSeed(int seed);
   static void SetNoiseType(NoiseType type);
-  static FastNoiseLite Get();
+  static void SetNoiseSettings(const NoiseSettings &settings);
+  static int GetNoise(int x, int z);
+  static int GetNoise(int x, int y, int z);
 
 private:
   static FastNoiseLite m_Noise;
+  static NoiseSettings m_NoiseSettings;
 };

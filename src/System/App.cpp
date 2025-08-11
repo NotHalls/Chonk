@@ -69,7 +69,6 @@ void App::Init()
   OnResize(1280, 720);
 
   Settings::Init();
-  Noise::Init();
 
   m_Window->ToggleCursor(true);
 }
